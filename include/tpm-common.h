@@ -7,8 +7,6 @@
 #ifndef __TPM_COMMON_H
 #define __TPM_COMMON_H
 
-#include <command.h>
-
 enum tpm_duration {
 	TPM_SHORT = 0,
 	TPM_MEDIUM = 1,
@@ -175,8 +173,8 @@ struct tpm_ops {
 	U_BOOT_CMD_MKENT(cmd, 0, 1, do_tpm_ ## cmd, "", "")
 
 #define TPM_COMMAND_NO_ARG(cmd)				\
-int do_##cmd(struct cmd_tbl *cmdtp, int flag,		\
-	     int argc, char *const argv[])		\
+int do_##cmd(cmd_tbl_t *cmdtp, int flag,		\
+	     int argc, char * const argv[])		\
 {							\
 	struct udevice *dev;				\
 	int rc;						\
@@ -265,20 +263,20 @@ int tpm_init(struct udevice *dev);
 /**
  * Retrieve the array containing all the v1 (resp. v2) commands.
  *
- * @return a struct cmd_tbl array.
+ * @return a cmd_tbl_t array.
  */
 #if defined(CONFIG_TPM_V1)
-struct cmd_tbl *get_tpm1_commands(unsigned int *size);
+cmd_tbl_t *get_tpm1_commands(unsigned int *size);
 #else
-static inline struct cmd_tbl *get_tpm1_commands(unsigned int *size)
+static inline cmd_tbl_t *get_tpm1_commands(unsigned int *size)
 {
 	return NULL;
 }
 #endif
 #if defined(CONFIG_TPM_V2)
-struct cmd_tbl *get_tpm2_commands(unsigned int *size);
+cmd_tbl_t *get_tpm2_commands(unsigned int *size);
 #else
-static inline struct cmd_tbl *get_tpm2_commands(unsigned int *size)
+static inline cmd_tbl_t *get_tpm2_commands(unsigned int *size)
 {
 	return NULL;
 }
@@ -294,8 +292,5 @@ static inline struct cmd_tbl *get_tpm2_commands(unsigned int *size)
  * @return version number (TPM_V1 or TPMV2)
  */
 enum tpm_version tpm_get_version(struct udevice *dev);
-
-/* Iterate on all TPM devices */
-#define for_each_tpm_device(dev) uclass_foreach_dev_probe(UCLASS_TPM, (dev))
 
 #endif /* __TPM_COMMON_H */

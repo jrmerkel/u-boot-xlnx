@@ -7,9 +7,7 @@
  */
 
 #include <common.h>
-#include <env.h>
 #include <lcd.h>
-#include <log.h>
 #include <asm/io.h>
 #include <asm/gpio.h>
 #include <asm/arch/cpu.h>
@@ -18,7 +16,6 @@
 #include <asm/arch/mipi_dsim.h>
 #include <asm/arch/watchdog.h>
 #include <asm/arch/power.h>
-#include <linux/delay.h>
 #include <power/pmic.h>
 #include <usb/dwc2_udc.h>
 #include <power/max8997_pmic.h>

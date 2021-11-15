@@ -11,7 +11,6 @@
 #include <dm.h>
 #include <timer.h>
 #include <asm/io.h>
-#include <linux/bitops.h>
 
 #define MTK_GPT4_CTRL	0x40
 #define MTK_GPT4_CLK	0x44
@@ -27,12 +26,14 @@ struct mtk_timer_priv {
 	void __iomem *base;
 };
 
-static u64 mtk_timer_get_count(struct udevice *dev)
+static int mtk_timer_get_count(struct udevice *dev, u64 *count)
 {
 	struct mtk_timer_priv *priv = dev_get_priv(dev);
 	u32 val = readl(priv->base + MTK_GPT4_CNT);
 
-	return timer_conv_64(val);
+	*count = timer_conv_64(val);
+
+	return 0;
 }
 
 static int mtk_timer_probe(struct udevice *dev)
@@ -70,7 +71,6 @@ static const struct timer_ops mtk_timer_ops = {
 
 static const struct udevice_id mtk_timer_ids[] = {
 	{ .compatible = "mediatek,timer" },
-	{ .compatible = "mediatek,mt6577-timer" },
 	{ }
 };
 

@@ -7,10 +7,7 @@
  */
 
 #include <common.h>
-#include <dm.h>
 #include <asm/io.h>
-#include <dm/device_compat.h>
-#include <linux/bitops.h>
 #include <power/regulator.h>
 #include "stm32-adc-core.h"
 
@@ -63,8 +60,7 @@ static int stm32h7_adc_clk_sel(struct udevice *dev,
 {
 	u32 ckmode, presc;
 	unsigned long rate;
-	unsigned int i;
-	int div;
+	int i, div;
 
 	/* stm32h7 bus clock is common for all ADC instances (mandatory) */
 	if (!clk_valid(&common->bclk)) {

@@ -4,7 +4,6 @@
  */
 
 #include <common.h>
-#include <vsprintf.h>
 #include <asm/mmu.h>
 #include <asm/immap_85xx.h>
 #include <asm/processor.h>

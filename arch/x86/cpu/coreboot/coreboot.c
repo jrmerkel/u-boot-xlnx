@@ -6,9 +6,7 @@
  */
 
 #include <common.h>
-#include <cpu_func.h>
 #include <fdtdec.h>
-#include <init.h>
 #include <usb.h>
 #include <asm/io.h>
 #include <asm/msr.h>
@@ -28,8 +26,7 @@ int arch_cpu_init(void)
 
 	timestamp_init();
 
-	return IS_ENABLED(CONFIG_X86_RUN_64BIT) ? x86_cpu_reinit_f() :
-		 x86_cpu_init_f();
+	return x86_cpu_init_f();
 }
 
 int checkcpu(void)
@@ -42,7 +39,7 @@ int print_cpuinfo(void)
 	return default_print_cpuinfo();
 }
 
-static void board_final_init(void)
+static void board_final_cleanup(void)
 {
 	/*
 	 * Un-cache the ROM so the kernel has one
@@ -76,11 +73,14 @@ static void board_final_init(void)
 
 int last_stage_init(void)
 {
+	if (gd->flags & GD_FLG_COLD_BOOT)
+		timestamp_add_to_bootstage();
+
 	/* start usb so that usb keyboard can be used as input device */
 	if (CONFIG_IS_ENABLED(USB_KEYBOARD))
 		usb_init();
 
-	board_final_init();
+	board_final_cleanup();
 
 	return 0;
 }

@@ -1,21 +1,15 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (C) 2017, STMicroelectronics - All Rights Reserved
- * Author(s): Patrice Chotard, <patrice.chotard@foss.st.com> for STMicroelectronics.
+ * Author(s): Patrice Chotard, <patrice.chotard@st.com> for STMicroelectronics.
  */
 
 #include <common.h>
 #include <dm.h>
 #include <errno.h>
-#include <log.h>
-#include <malloc.h>
 #include <reset-uclass.h>
 #include <stm32_rcc.h>
 #include <asm/io.h>
-#include <linux/bitops.h>
-
-/* offset of register without set/clear management */
-#define RCC_MP_GCR_OFFSET 0x10C
 
 /* reset clear offset for STM32MP RCC */
 #define RCC_CL 0x4
@@ -43,11 +37,8 @@ static int stm32_reset_assert(struct reset_ctl *reset_ctl)
 	      reset_ctl->id, bank, offset);
 
 	if (dev_get_driver_data(reset_ctl->dev) == STM32MP1)
-		if (bank != RCC_MP_GCR_OFFSET)
-			/* reset assert is done in rcc set register */
-			writel(BIT(offset), priv->base + bank);
-		else
-			clrbits_le32(priv->base + bank, BIT(offset));
+		/* reset assert is done in rcc set register */
+		writel(BIT(offset), priv->base + bank);
 	else
 		setbits_le32(priv->base + bank, BIT(offset));
 
@@ -63,11 +54,8 @@ static int stm32_reset_deassert(struct reset_ctl *reset_ctl)
 	      reset_ctl->id, bank, offset);
 
 	if (dev_get_driver_data(reset_ctl->dev) == STM32MP1)
-		if (bank != RCC_MP_GCR_OFFSET)
-			/* reset deassert is done in rcc clr register */
-			writel(BIT(offset), priv->base + bank + RCC_CL);
-		else
-			setbits_le32(priv->base + bank, BIT(offset));
+		/* reset deassert is done in rcc clr register */
+		writel(BIT(offset), priv->base + bank + RCC_CL);
 	else
 		clrbits_le32(priv->base + bank, BIT(offset));
 
@@ -76,7 +64,7 @@ static int stm32_reset_deassert(struct reset_ctl *reset_ctl)
 
 static const struct reset_ops stm32_reset_ops = {
 	.request	= stm32_reset_request,
-	.rfree		= stm32_reset_free,
+	.free		= stm32_reset_free,
 	.rst_assert	= stm32_reset_assert,
 	.rst_deassert	= stm32_reset_deassert,
 };

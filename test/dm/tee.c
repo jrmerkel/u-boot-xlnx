@@ -5,12 +5,9 @@
 
 #include <common.h>
 #include <dm.h>
-#include <log.h>
-#include <malloc.h>
 #include <dm/test.h>
 #include <sandboxtee.h>
 #include <tee.h>
-#include <test/test.h>
 #include <test/ut.h>
 #include <tee/optee_ta_avb.h>
 
@@ -115,4 +112,4 @@ static int dm_test_tee(struct unit_test_state *uts)
 	return rc;
 }
 
-DM_TEST(dm_test_tee, UT_TESTF_SCAN_FDT);
+DM_TEST(dm_test_tee, DM_TESTF_SCAN_FDT);

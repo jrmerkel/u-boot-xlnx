@@ -7,11 +7,9 @@
 
 #include <common.h>
 #include <dm.h>
-#include <init.h>
-#include <log.h>
 #include <pci.h>
 #include <usb.h>
-#include <usb/xhci.h>
+#include "xhci.h"
 
 static void xhci_pci_init(struct udevice *dev, struct xhci_hccr **ret_hccr,
 			  struct xhci_hcor **ret_hcor)

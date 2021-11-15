@@ -12,7 +12,6 @@
 
 #include <common.h>
 #include <dm.h>
-#include <log.h>
 #include <malloc.h>
 #include <errno.h>
 #include <fdtdec.h>

@@ -6,7 +6,6 @@
 #include <common.h>
 #include <fsl_ddr_sdram.h>
 #include <fsl_ddr_dimm_params.h>
-#include <log.h>
 #include <asm/arch/soc.h>
 #include <asm/arch/clock.h>
 #include "ddr.h"
@@ -112,17 +111,7 @@ found:
 			  DDR_CDR2_VREF_TRAIN_EN | DDR_CDR2_VREF_RANGE_2;
 }
 
-#ifdef CONFIG_TFABOOT
-int fsl_initdram(void)
-{
-	gd->ram_size = tfa_get_dram_size();
 
-	if (!gd->ram_size)
-		gd->ram_size = fsl_ddr_sdram_size();
-
-	return 0;
-}
-#else
 int fsl_initdram(void)
 {
 	puts("Initializing DDR....using SPD\n");
@@ -134,4 +123,3 @@ int fsl_initdram(void)
 #endif
 	return 0;
 }
-#endif /* CONFIG_TFABOOT */

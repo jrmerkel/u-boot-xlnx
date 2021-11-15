@@ -5,11 +5,8 @@
  */
 
 #include <common.h>
-#include <command.h>
-#include <env.h>
 #include <lcd.h>
 #include <libtizen.h>
-#include <linux/delay.h>
 #include <samsung/misc.h>
 #include <errno.h>
 #include <version.h>
@@ -104,7 +101,7 @@ void set_board_info(void)
 		bdtype = "";
 
 	sprintf(info, "%s%s", bdname, bdtype);
-	env_set("board_name", info);
+	env_set("boardname", info);
 #endif
 	snprintf(info, ARRAY_SIZE(info),  "%s%x-%s%s.dtb",
 		 CONFIG_SYS_SOC, s5p_cpu_id, bdname, bdtype);
@@ -263,7 +260,7 @@ static int mode_leave_menu(int mode)
 	char *exit_option;
 	char *exit_reset = "reset";
 	char *exit_back = "back";
-	struct cmd_tbl *cmd;
+	cmd_tbl_t *cmd;
 	int cmd_result;
 	int leave;
 

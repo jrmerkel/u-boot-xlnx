@@ -6,12 +6,7 @@
  */
 
 #include <common.h>
-#include <env.h>
 #include <errno.h>
-#include <init.h>
-#include <malloc.h>
-#include <net.h>
-#include <serial.h>
 #include <spl.h>
 #include <asm/arch/cpu.h>
 #include <asm/arch/hardware.h>
@@ -30,6 +25,7 @@
 #include <fdt_support.h>
 #include <mtd_node.h>
 #include <jffs2/load_kernel.h>
+#include <environment.h>
 #include "board.h"
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -212,7 +208,7 @@ int board_late_init(void)
 #endif
 
 #ifdef CONFIG_OF_BOARD_SETUP
-int ft_board_setup(void *blob, struct bd_info *bd)
+int ft_board_setup(void *blob, bd_t *bd)
 {
 #ifdef CONFIG_FDT_FIXUP_PARTITIONS
 	static const struct node_info nodes[] = {
@@ -261,7 +257,7 @@ static struct cpsw_platform_data cpsw_data = {
 	.version		= CPSW_CTRL_VERSION_2,
 };
 
-int board_eth_init(struct bd_info *bis)
+int board_eth_init(bd_t *bis)
 {
 	int rv, ret = 0;
 	uint8_t mac_addr[6];

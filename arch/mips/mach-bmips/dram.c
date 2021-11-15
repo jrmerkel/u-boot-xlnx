@@ -5,8 +5,6 @@
  */
 
 #include <common.h>
-#include <init.h>
-#include <log.h>
 #include <ram.h>
 #include <dm.h>
 

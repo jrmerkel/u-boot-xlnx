@@ -7,7 +7,6 @@
  */
 
 #include <common.h>
-#include <init.h>
 #include <mvmfp.h>
 #include <asm/mach-types.h>
 #include <asm/arch/cpu.h>

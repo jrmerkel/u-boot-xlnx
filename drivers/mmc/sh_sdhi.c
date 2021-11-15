@@ -10,14 +10,9 @@
  */
 
 #include <common.h>
-#include <log.h>
 #include <malloc.h>
 #include <mmc.h>
 #include <dm.h>
-#include <part.h>
-#include <dm/device_compat.h>
-#include <linux/bitops.h>
-#include <linux/delay.h>
 #include <linux/errno.h>
 #include <linux/compat.h>
 #include <linux/io.h>
@@ -784,7 +779,8 @@ int sh_sdhi_init(unsigned long addr, int ch, unsigned long quirks)
 
 	return ret;
 error:
-	free(host);
+	if (host)
+		free(host);
 	return ret;
 }
 
@@ -833,7 +829,7 @@ static int sh_sdhi_dm_probe(struct udevice *dev)
 	fdt_addr_t base;
 	int ret;
 
-	base = dev_read_addr(dev);
+	base = devfdt_get_addr(dev);
 	if (base == FDT_ADDR_T_NONE)
 		return -EINVAL;
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright (C) 2018, STMicroelectronics - All Rights Reserved
- * Author(s): Patrice Chotard, <patrice.chotard@foss.st.com> for STMicroelectronics.
+ * Author(s): Patrice Chotard, <patrice.chotard@st.com> for STMicroelectronics.
  */
 
 #include <common.h>
@@ -9,8 +9,6 @@
 #include <dm.h>
 #include <fdtdec.h>
 #include <timer.h>
-#include <dm/device_compat.h>
-#include <linux/bitops.h>
 
 #include <asm/io.h>
 
@@ -52,12 +50,14 @@ struct stm32_timer_priv {
 	struct stm32_timer_regs *base;
 };
 
-static u64 stm32_timer_get_count(struct udevice *dev)
+static int stm32_timer_get_count(struct udevice *dev, u64 *count)
 {
 	struct stm32_timer_priv *priv = dev_get_priv(dev);
 	struct stm32_timer_regs *regs = priv->base;
 
-	return readl(&regs->cnt);
+	*count = readl(&regs->cnt);
+
+	return 0;
 }
 
 static int stm32_timer_probe(struct udevice *dev)

@@ -10,12 +10,6 @@
 #include "versal-vc-p-a2197-00-revA.dts"
 
 / {
-	compatible = "xlnx,versal-vc-p-a2197-00-revA-x-prc-02-revA",
-		     "xlnx,versal-vc-p-a2197-00-revA",
-		     "xlnx,versal-vc-p-a2197-00",
-		     "xlnx,versal-vc-p-a2197", "xlnx,versal";
-	model = "Xilinx Versal A2197 Processor board revA - x-prc-02 revA";
-
 	chosen {
 		bootargs = "console=ttyAMA0 earlycon=pl011,mmio32,0xFF000000,115200n8 clk_ignore_unused";
 		stdout-path = "serial0:115200";
@@ -28,7 +22,6 @@
 		mmc0 = &sdhci0;
 		mmc1 = &sdhci1;
 		spi0 = &spi0;
-		spi1 = &spi1;
 		usb0 = &usb0;
 	};
 };
@@ -48,7 +41,7 @@
 
 &sdhci0 {
 	status = "okay";
-	xlnx,mio-bank = <1>;
+	xlnx,mio_bank = <1>;
 };
 
 &sdhci1 { /* U1A */
@@ -56,7 +49,7 @@
 	non-removable;
 	disable-wp;
 	bus-width = <8>;
-	xlnx,mio-bank = <0>;
+	xlnx,mio_bank = <0>;
 };
 
 &usb0 {
@@ -100,7 +93,7 @@
 	flash@0 { /* U18 */
 		#address-cells = <1>;
 		#size-cells = <1>;
-		compatible = "sst,sst25vf016b", "m25p80", "jedec,spi-nor";
+		compatible = "sst,sst25vf016b", "m25p80", "spi-flash";
 		spi-max-frequency = <25000000>;
 		reg = <0>;
 
@@ -118,11 +111,11 @@
 	flash@0 { /* U19 */
 		#address-cells = <1>;
 		#size-cells = <1>;
-		compatible = "sst,sst26vf016b", "m25p80", "jedec,spi-nor";
+		compatible = "m25p80", "spi-flash";
 		spi-max-frequency = <25000000>;
 		reg = <0>;
 
-		partition@0 {
+		partition@1 {
 			label = "spi1-flash0";
 			reg = <0x0 0x200000>;
 		};

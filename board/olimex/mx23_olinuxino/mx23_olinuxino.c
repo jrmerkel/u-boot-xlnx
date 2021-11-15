@@ -6,7 +6,6 @@
  */
 
 #include <common.h>
-#include <init.h>
 #include <asm/gpio.h>
 #include <asm/io.h>
 #include <asm/arch/iomux-mx23.h>
@@ -16,7 +15,6 @@
 #ifdef CONFIG_LED_STATUS
 #include <status_led.h>
 #endif
-#include <linux/delay.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -62,7 +60,7 @@ static int mx23_olx_mmc_cd(int id)
 	return 1;	/* Card always present */
 }
 
-int board_mmc_init(struct bd_info *bis)
+int board_mmc_init(bd_t *bis)
 {
 	return mxsmmc_initialize(bis, 0, NULL, mx23_olx_mmc_cd);
 }

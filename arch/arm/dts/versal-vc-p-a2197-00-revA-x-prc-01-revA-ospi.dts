@@ -11,12 +11,6 @@
 #include <dt-bindings/gpio/gpio.h>
 
 / {
-	compatible = "xlnx,versal-vc-p-a2197-00-revA-x-prc-01-revA",
-		     "xlnx,versal-vc-p-a2197-00-revA",
-		     "xlnx,versal-vc-p-a2197-00",
-		     "xlnx,versal-vc-p-a2197", "xlnx,versal";
-	model = "Xilinx Versal A2197 Processor board revA - x-prc-01 revA OSPI";
-
 	aliases {
 		spi0 = &ospi;
 	};
@@ -25,6 +19,7 @@
 /* Mutually exclusive */
 &ospi {
 	status = "okay"; /* U97 MT35XU02G */
+	compatible = "xlnx,versal-ospi-1.0", "cadence,qspi", "cdns,qspi-nor";
 	bus-num = <2>;
 	num-cs = <1>;
 	#stream-id-cells = <1>;
@@ -33,7 +28,7 @@
 	reset-gpios = <&gpio1 0xc GPIO_ACTIVE_HIGH>;
 
 	flash@0 {
-		compatible = "mt35xu02g", "micron,m25p80", "jedec,spi-nor";
+		compatible = "mt35xu02g", "micron,m25p80", "spi-flash";
 		reg = <0>;
 		#address-cells = <0x1>;
 		#size-cells = <0x1>;
@@ -42,14 +37,31 @@
 		cdns,tsd2d-ns = <0x0>;
 		cdns,tchsh-ns = <0x1>;
 		cdns,tslch-ns = <0x1>;
-		spi-tx-bus-width = <8>;
+		spi-tx-bus-width = <1>;
 		spi-rx-bus-width = <8>;
 		spi-max-frequency = <20000000>;
-		partition@0 {
-			label = "spi0-flash0";
-			reg = <0x0 0x8000000>;
+		partition@0 { /* for testing purpose */
+			label = "ospi-fsbl-uboot-boot.bin";
+			reg = <0x0 0x6400000>;
+		};
+		partition@6400000 { /* for testing purpose */
+			label = "ospi-linux";
+			reg = <0x6400000 0x500000>;
+		};
+		partition@6900000 { /* for testing purpose */
+			label = "ospi-device-tree";
+			reg = <0x6900000 0x20000>;
+		};
+		partition@6920000 { /* for testing purpose */
+			label = "ospi-rootfs";
+			reg = <0x6920000 0xa00000>;
+		};
+		partition@7f40000 {
+			label = "ospi-bootenv";
+			reg = <0x7f40000 0x40000>;
 		};
 	};
+
 };
 
 &qspi {

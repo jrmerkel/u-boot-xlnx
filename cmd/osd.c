@@ -10,7 +10,6 @@
  */
 
 #include <common.h>
-#include <command.h>
 #include <dm.h>
 #include <hexdump.h>
 #include <video_osd.h>
@@ -81,8 +80,8 @@ static void show_osd(struct udevice *osd)
 	printf("\n");
 }
 
-static int do_osd_write(struct cmd_tbl *cmdtp, int flag, int argc,
-			char *const argv[])
+static int do_osd_write(cmd_tbl_t *cmdtp, int flag, int argc,
+			char * const argv[])
 {
 	uint x, y;
 	uint count;
@@ -132,8 +131,8 @@ static int do_osd_write(struct cmd_tbl *cmdtp, int flag, int argc,
 	return CMD_RET_SUCCESS;
 }
 
-static int do_osd_print(struct cmd_tbl *cmdtp, int flag, int argc,
-			char *const argv[])
+static int do_osd_print(cmd_tbl_t *cmdtp, int flag, int argc,
+			char * const argv[])
 {
 	uint x, y;
 	u8 color;
@@ -162,8 +161,8 @@ static int do_osd_print(struct cmd_tbl *cmdtp, int flag, int argc,
 	return CMD_RET_SUCCESS;
 }
 
-static int do_osd_size(struct cmd_tbl *cmdtp, int flag, int argc,
-		       char *const argv[])
+static int do_osd_size(cmd_tbl_t *cmdtp, int flag, int argc,
+		       char * const argv[])
 {
 	uint x, y;
 	int res;
@@ -188,8 +187,8 @@ static int do_osd_size(struct cmd_tbl *cmdtp, int flag, int argc,
 	return CMD_RET_SUCCESS;
 }
 
-static int do_show_osd(struct cmd_tbl *cmdtp, int flag, int argc,
-		       char *const argv[])
+static int do_show_osd(cmd_tbl_t *cmdtp, int flag, int argc,
+		       char * const argv[])
 {
 	struct udevice *osd;
 
@@ -224,8 +223,8 @@ static int do_show_osd(struct cmd_tbl *cmdtp, int flag, int argc,
 	return CMD_RET_SUCCESS;
 }
 
-static int do_osd_num(struct cmd_tbl *cmdtp, int flag, int argc,
-		      char *const argv[])
+static int do_osd_num(cmd_tbl_t *cmdtp, int flag, int argc,
+		      char * const argv[])
 {
 	int osd_no;
 	int res = 0;
@@ -251,7 +250,7 @@ static int do_osd_num(struct cmd_tbl *cmdtp, int flag, int argc,
 	return res ? CMD_RET_FAILURE : CMD_RET_SUCCESS;
 }
 
-static struct cmd_tbl cmd_osd_sub[] = {
+static cmd_tbl_t cmd_osd_sub[] = {
 	U_BOOT_CMD_MKENT(show, 1, 1, do_show_osd, "", ""),
 	U_BOOT_CMD_MKENT(dev, 1, 1, do_osd_num, "", ""),
 	U_BOOT_CMD_MKENT(write, 4, 1, do_osd_write, "", ""),
@@ -259,9 +258,9 @@ static struct cmd_tbl cmd_osd_sub[] = {
 	U_BOOT_CMD_MKENT(size, 2, 1, do_osd_size, "", ""),
 };
 
-static int do_osd(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
+static int do_osd(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
-	struct cmd_tbl *c;
+	cmd_tbl_t *c;
 
 	if (argc < 2)
 		return CMD_RET_USAGE;

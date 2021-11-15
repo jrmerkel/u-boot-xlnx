@@ -5,12 +5,8 @@
  */
 
 #include <common.h>
-#include <command.h>
-#include <cpu_func.h>
-#include <env.h>
 #include <malloc.h>
 #include <memalign.h>
-#include <zynqmp_firmware.h>
 #include <asm/arch/hardware.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/io.h>
@@ -25,8 +21,8 @@ struct aes {
 	u64 keysrc;
 };
 
-static int do_zynqmp_verify_secure(struct cmd_tbl *cmdtp, int flag, int argc,
-				   char *const argv[])
+static int do_zynqmp_verify_secure(cmd_tbl_t *cmdtp, int flag, int argc,
+				   char * const argv[])
 {
 	u64 src_addr, addr;
 	u32 len, src_lo, src_hi;
@@ -64,8 +60,8 @@ static int do_zynqmp_verify_secure(struct cmd_tbl *cmdtp, int flag, int argc,
 				   (ulong)(key_ptr + KEY_PTR_LEN));
 	}
 
-	ret = xilinx_pm_request(PM_SECURE_IMAGE, src_lo, src_hi,
-				key_lo, key_hi, ret_payload);
+	ret = invoke_smc(ZYNQMP_SIP_SVC_PM_SECURE_IMG_LOAD, src_lo, src_hi,
+			 key_lo, key_hi, ret_payload);
 	if (ret) {
 		printf("Failed: secure op status:0x%x\n", ret);
 	} else {
@@ -77,8 +73,8 @@ static int do_zynqmp_verify_secure(struct cmd_tbl *cmdtp, int flag, int argc,
 	return ret;
 }
 
-static int do_zynqmp_mmio_read(struct cmd_tbl *cmdtp, int flag, int argc,
-			       char *const argv[])
+static int do_zynqmp_mmio_read(cmd_tbl_t *cmdtp, int flag, int argc,
+			       char * const argv[])
 {
 	u32 read_val, addr;
 	int ret;
@@ -98,8 +94,8 @@ static int do_zynqmp_mmio_read(struct cmd_tbl *cmdtp, int flag, int argc,
 	return ret;
 }
 
-static int do_zynqmp_mmio_write(struct cmd_tbl *cmdtp, int flag, int argc,
-				char *const argv[])
+static int do_zynqmp_mmio_write(cmd_tbl_t *cmdtp, int flag, int argc,
+				char * const argv[])
 {
 	u32 addr, mask, val;
 	int ret;
@@ -118,14 +114,14 @@ static int do_zynqmp_mmio_write(struct cmd_tbl *cmdtp, int flag, int argc,
 	return ret;
 }
 
-static int do_zynqmp_aes(struct cmd_tbl *cmdtp, int flag, int argc,
+static int do_zynqmp_aes(cmd_tbl_t *cmdtp, int flag, int argc,
 			 char * const argv[])
 {
 	ALLOC_CACHE_ALIGN_BUFFER(struct aes, aes, 1);
 	int ret;
 	u32 ret_payload[PAYLOAD_ARG_CNT];
 
-	if (zynqmp_firmware_version() <= PMUFW_V1_0) {
+	if (zynqmp_pmufw_version() <= PMUFW_V1_0) {
 		puts("ERR: PMUFW v1.0 or less is detected\n");
 		puts("ERR: Encrypt/Decrypt feature is not supported\n");
 		puts("ERR: Please upgrade PMUFW\n");
@@ -169,8 +165,9 @@ static int do_zynqmp_aes(struct cmd_tbl *cmdtp, int flag, int argc,
 						    ARCH_DMA_MINALIGN)));
 	}
 
-	ret = xilinx_pm_request(PM_SECURE_AES, upper_32_bits((ulong)aes),
-				lower_32_bits((ulong)aes), 0, 0, ret_payload);
+	ret = invoke_smc(ZYNQMP_SIP_SVC_PM_SECURE_AES,
+			 upper_32_bits((ulong)aes), lower_32_bits((ulong)aes),
+			 0, 0, ret_payload);
 	if (ret || ret_payload[1])
 		printf("Failed: AES op status:0x%x, errcode:0x%x\n",
 		       ret, ret_payload[1]);
@@ -179,8 +176,8 @@ static int do_zynqmp_aes(struct cmd_tbl *cmdtp, int flag, int argc,
 }
 
 #ifdef CONFIG_DEFINE_TCM_OCM_MMAP
-static int do_zynqmp_tcm_init(struct cmd_tbl *cmdtp, int flag, int argc,
-			      char *const argv[])
+static int do_zynqmp_tcm_init(cmd_tbl_t *cmdtp, int flag, int argc,
+			      char * const argv[])
 {
 	u8 mode;
 
@@ -201,25 +198,7 @@ static int do_zynqmp_tcm_init(struct cmd_tbl *cmdtp, int flag, int argc,
 }
 #endif
 
-static int do_zynqmp_pmufw(struct cmd_tbl *cmdtp, int flag, int argc,
-			   char * const argv[])
-{
-	u32 addr, size;
-
-	if (argc != cmdtp->maxargs)
-		return CMD_RET_USAGE;
-
-	addr = simple_strtoul(argv[2], NULL, 16);
-	size = simple_strtoul(argv[3], NULL, 16);
-	flush_dcache_range((ulong)addr, (ulong)(addr + size));
-
-	zynqmp_pmufw_load_config_object((const void *)(uintptr_t)addr,
-					(size_t)size);
-
-	return 0;
-}
-
-static int do_zynqmp_rsa(struct cmd_tbl *cmdtp, int flag, int argc,
+static int do_zynqmp_rsa(cmd_tbl_t *cmdtp, int flag, int argc,
 			 char * const argv[])
 {
 	u64 srcaddr, mod, exp;
@@ -229,7 +208,7 @@ static int do_zynqmp_rsa(struct cmd_tbl *cmdtp, int flag, int argc,
 	if (argc != cmdtp->maxargs)
 		return CMD_RET_USAGE;
 
-	if (zynqmp_firmware_version() <= PMUFW_V1_0) {
+	if (zynqmp_pmufw_version() <= PMUFW_V1_0) {
 		puts("ERR: PMUFW v1.0 or less is detected\n");
 		puts("ERR: Encrypt/Decrypt feature is not supported\n");
 		puts("ERR: Please upgrade PMUFW\n");
@@ -270,9 +249,12 @@ static int do_zynqmp_rsa(struct cmd_tbl *cmdtp, int flag, int argc,
 	flush_dcache_range((ulong)srcaddr,
 			   (ulong)(srcaddr) + roundup(size, ARCH_DMA_MINALIGN));
 
-	ret = xilinx_pm_request(PM_SECURE_RSA, upper_32_bits((ulong)srcaddr),
-				lower_32_bits((ulong)srcaddr), srclen, rsaop,
-				ret_payload);
+	ret = invoke_smc(ZYNQMP_SIP_SVC_PM_SECURE_RSA,
+			 upper_32_bits((ulong)srcaddr),
+			 lower_32_bits((ulong)srcaddr),
+			 srclen,
+			 rsaop,
+			 ret_payload);
 	if (ret || ret_payload[1]) {
 		printf("Failed: RSA status:0x%x, errcode:0x%x\n",
 		       ret, ret_payload[1]);
@@ -282,17 +264,17 @@ static int do_zynqmp_rsa(struct cmd_tbl *cmdtp, int flag, int argc,
 	return CMD_RET_SUCCESS;
 }
 
-static int do_zynqmp_sha3(struct cmd_tbl *cmdtp, int flag,
+static int do_zynqmp_sha3(cmd_tbl_t *cmdtp, int flag,
 			  int argc, char * const argv[])
 {
-	u64 srcaddr, hashaddr;
+	u64 srcaddr;
 	u32 srclen, ret_payload[PAYLOAD_ARG_CNT];
 	int ret;
 
-	if (argc > cmdtp->maxargs || argc < (cmdtp->maxargs - 1))
+	if (argc != cmdtp->maxargs)
 		return CMD_RET_USAGE;
 
-	if (zynqmp_firmware_version() <= PMUFW_V1_0) {
+	if (zynqmp_pmufw_version() <= PMUFW_V1_0) {
 		puts("ERR: PMUFW v1.0 or less is detected\n");
 		puts("ERR: Encrypt/Decrypt feature is not supported\n");
 		puts("ERR: Please upgrade PMUFW\n");
@@ -301,15 +283,6 @@ static int do_zynqmp_sha3(struct cmd_tbl *cmdtp, int flag,
 
 	srcaddr = simple_strtoul(argv[2], NULL, 16);
 	srclen = simple_strtoul(argv[3], NULL, 16);
-
-	if (argc == 5) {
-		hashaddr = simple_strtoul(argv[4], NULL, 16);
-		flush_dcache_range(hashaddr,
-				   hashaddr + roundup(ZYNQMP_SHA3_SIZE,
-						      ARCH_DMA_MINALIGN));
-	} else {
-		hashaddr = srcaddr;
-	}
 
 	/* Check srcaddr or srclen != 0 */
 	if (!srcaddr || !srclen) {
@@ -320,27 +293,32 @@ static int do_zynqmp_sha3(struct cmd_tbl *cmdtp, int flag,
 	flush_dcache_range(srcaddr,
 			   srcaddr + roundup(srclen, ARCH_DMA_MINALIGN));
 
-	ret = xilinx_pm_request(PM_SECURE_SHA, 0, 0, 0,
-				ZYNQMP_SHA3_INIT, ret_payload);
+	ret = invoke_smc(ZYNQMP_SIP_SVC_PM_SECURE_SHA, 0, 0, 0,
+			 ZYNQMP_SHA3_INIT, ret_payload);
 	if (ret || ret_payload[1]) {
 		printf("Failed: SHA INIT status:0x%x, errcode:0x%x\n",
 		       ret, ret_payload[1]);
 		return CMD_RET_FAILURE;
 	}
 
-	ret = xilinx_pm_request(PM_SECURE_SHA, upper_32_bits((ulong)srcaddr),
-				lower_32_bits((ulong)srcaddr),
-				srclen, ZYNQMP_SHA3_UPDATE, ret_payload);
+	ret = invoke_smc(ZYNQMP_SIP_SVC_PM_SECURE_SHA,
+			 upper_32_bits((ulong)srcaddr),
+			 lower_32_bits((ulong)srcaddr),
+			 srclen,
+			 ZYNQMP_SHA3_UPDATE,
+			 ret_payload);
 	if (ret || ret_payload[1]) {
 		printf("Failed: SHA UPDATE status:0x%x, errcode:0x%x\n",
 		       ret, ret_payload[1]);
 		return CMD_RET_FAILURE;
 	}
 
-	ret = xilinx_pm_request(PM_SECURE_SHA, upper_32_bits((ulong)hashaddr),
-				lower_32_bits((ulong)hashaddr),
-				ZYNQMP_SHA3_SIZE, ZYNQMP_SHA3_FINAL,
-				ret_payload);
+	ret = invoke_smc(ZYNQMP_SIP_SVC_PM_SECURE_SHA,
+			 upper_32_bits((ulong)srcaddr),
+			 lower_32_bits((ulong)srcaddr),
+			 ZYNQMP_SHA3_SIZE,
+			 ZYNQMP_SHA3_FINAL,
+			 ret_payload);
 	if (ret || ret_payload[1]) {
 		printf("Failed: SHA FINAL status:0x%x, errcode:0x%x\n",
 		       ret, ret_payload[1]);
@@ -350,14 +328,13 @@ static int do_zynqmp_sha3(struct cmd_tbl *cmdtp, int flag,
 	return CMD_RET_SUCCESS;
 }
 
-static struct cmd_tbl cmd_zynqmp_sub[] = {
+static cmd_tbl_t cmd_zynqmp_sub[] = {
 	U_BOOT_CMD_MKENT(secure, 5, 0, do_zynqmp_verify_secure, "", ""),
-	U_BOOT_CMD_MKENT(pmufw, 4, 0, do_zynqmp_pmufw, "", ""),
 	U_BOOT_CMD_MKENT(mmio_read, 3, 0, do_zynqmp_mmio_read, "", ""),
 	U_BOOT_CMD_MKENT(mmio_write, 5, 0, do_zynqmp_mmio_write, "", ""),
 	U_BOOT_CMD_MKENT(aes, 9, 0, do_zynqmp_aes, "", ""),
 	U_BOOT_CMD_MKENT(rsa, 7, 0, do_zynqmp_rsa, "", ""),
-	U_BOOT_CMD_MKENT(sha3, 5, 0, do_zynqmp_sha3, "", ""),
+	U_BOOT_CMD_MKENT(sha3, 4, 0, do_zynqmp_sha3, "", ""),
 #ifdef CONFIG_DEFINE_TCM_OCM_MMAP
 	U_BOOT_CMD_MKENT(tcminit, 3, 0, do_zynqmp_tcm_init, "", ""),
 #endif
@@ -374,10 +351,10 @@ static struct cmd_tbl cmd_zynqmp_sub[] = {
  *
  * Return: return 0 on success and CMD_RET_USAGE incase of misuse and error
  */
-static int do_zynqmp(struct cmd_tbl *cmdtp, int flag, int argc,
+static int do_zynqmp(cmd_tbl_t *cmdtp, int flag, int argc,
 		     char *const argv[])
 {
-	struct cmd_tbl *c;
+	cmd_tbl_t *c;
 
 	if (argc < 2)
 		return CMD_RET_USAGE;
@@ -401,7 +378,7 @@ static char zynqmp_help_text[] =
 	"zynqmp mmio_read address - read from address\n"
 	"zynqmp mmio_write address mask value - write value after masking to\n"
 	"					address\n"
-	"zynqmp aes srcaddr ivaddr len aesop keysrc dstaddr [keyaddr] -\n"
+	"zynqmp aes srcaddr ivaddr len aesop keysrc dstaddr [keyaddr]\n"
 	"	Encrypts or decrypts blob of data at src address and puts it\n"
 	"	back to dstaddr using key and iv at keyaddr and ivaddr\n"
 	"	respectively. keysrc value specifies from which source key\n"
@@ -416,8 +393,7 @@ static char zynqmp_help_text[] =
 	"		       to be initialized. Supported modes will be\n"
 	"		       lock(0)/split(1)\n"
 #endif
-	"zynqmp pmufw address size - load PMU FW configuration object\n"
-	"zynqmp rsa srcaddr srclen mod exp rsaop -\n"
+	"zynqmp rsa srcaddr srclen mod exp rsaop\n"
 	"	Performs RSA encryption and RSA decryption on blob of data\n"
 	"	at srcaddr and puts it back in srcaddr using modulus and\n"
 	"	public or private exponent\n"
@@ -425,10 +401,9 @@ static char zynqmp_help_text[] =
 	"	exp :	private key exponent for RSA decryption(4096 bits)\n"
 	"		public key exponent for RSA encryption(32 bits)\n"
 	"	rsaop :	0 for RSA Decryption, 1 for RSA Encryption\n"
-	"zynqmp sha3 srcaddr srclen [key_addr] -\n"
+	"zynqmp sha3 srcaddr srclen\n"
 	"	Generates sha3 hash value for data blob at srcaddr and puts\n"
 	"	48 bytes hash value into srcaddr\n"
-	"	Optional key_addr can be specified for saving sha3 hash value\n"
 	"	Note: srcaddr/srclen should not be 0\n"
 	;
 #endif

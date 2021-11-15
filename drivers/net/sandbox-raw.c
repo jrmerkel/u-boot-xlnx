@@ -6,11 +6,9 @@
  * Joe Hershberger <joe.hershberger@ni.com>
  */
 
-#include <log.h>
 #include <asm/eth-raw-os.h>
 #include <common.h>
 #include <dm.h>
-#include <env.h>
 #include <malloc.h>
 #include <net.h>
 
@@ -154,6 +152,7 @@ static int sb_eth_raw_ofdata_to_platdata(struct udevice *dev)
 	struct eth_pdata *pdata = dev_get_platdata(dev);
 	struct eth_sandbox_raw_priv *priv = dev_get_priv(dev);
 	const char *ifname;
+	u32 local;
 	int ret;
 
 	pdata->iobase = dev_read_addr(dev);
@@ -174,10 +173,10 @@ static int sb_eth_raw_ofdata_to_platdata(struct udevice *dev)
 		       priv->host_ifindex, priv->host_ifname);
 	}
 
-	ret = sandbox_eth_raw_os_is_local(priv->host_ifname);
-	if (ret < 0)
-		return ret;
-	priv->local = ret;
+	local = sandbox_eth_raw_os_is_local(priv->host_ifname);
+	if (local < 0)
+		return local;
+	priv->local = local;
 
 	return 0;
 }

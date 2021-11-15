@@ -7,10 +7,8 @@
 #ifndef __DWMMC_HW_H
 #define __DWMMC_HW_H
 
-#include <asm/cache.h>
 #include <asm/io.h>
 #include <mmc.h>
-#include <linux/bitops.h>
 
 #define DWMCI_CTRL		0x000
 #define	DWMCI_PWREN		0x004
@@ -131,13 +129,6 @@
 
 /* UHS register */
 #define DWMCI_DDR_MODE	(1 << 16)
-
-/* Internal IDMAC interrupt defines */
-#define DWMCI_IDINTEN_RI		BIT(1)
-#define DWMCI_IDINTEN_TI		BIT(0)
-
-#define DWMCI_IDINTEN_MASK	(DWMCI_IDINTEN_TI | \
-				 DWMCI_IDINTEN_RI)
 
 /* quirks */
 #define DWMCI_QUIRK_DISABLE_SMU		(1 << 0)

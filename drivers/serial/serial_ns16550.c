@@ -5,10 +5,14 @@
  */
 
 #include <common.h>
-#include <clock_legacy.h>
-#include <ns16550.h>
-#include <serial.h>
 #include <linux/compiler.h>
+
+#include <ns16550.h>
+#ifdef CONFIG_NS87308
+#include <ns87308.h>
+#endif
+
+#include <serial.h>
 
 #ifndef CONFIG_NS16550_MIN_FUNCTIONS
 

@@ -62,13 +62,14 @@ struct atftmr_timer_platdata {
 	struct atftmr_timer_regs *regs;
 };
 
-static u64 atftmr_timer_get_count(struct udevice *dev)
+static int atftmr_timer_get_count(struct udevice *dev, u64 *count)
 {
 	struct atftmr_timer_platdata *plat = dev->platdata;
 	struct atftmr_timer_regs *const regs = plat->regs;
 	u32 val;
 	val = readl(&regs->t3_counter);
-	return timer_conv_64(val);
+	*count = timer_conv_64(val);
+	return 0;
 }
 
 static int atftmr_timer_probe(struct udevice *dev)
@@ -91,7 +92,7 @@ static int atftmr_timer_probe(struct udevice *dev)
 static int atftme_timer_ofdata_to_platdata(struct udevice *dev)
 {
 	struct atftmr_timer_platdata *plat = dev_get_platdata(dev);
-	plat->regs = map_physmem(dev_read_addr(dev),
+	plat->regs = map_physmem(devfdt_get_addr(dev),
 				 sizeof(struct atftmr_timer_regs),
 				 MAP_NOCACHE);
 	return 0;

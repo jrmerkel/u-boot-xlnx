@@ -11,7 +11,6 @@
 #include <os.h>
 #include <malloc.h>
 #include <sandboxblockdev.h>
-#include <dm/device_compat.h>
 #include <linux/errno.h>
 #include <dm/device-internal.h>
 

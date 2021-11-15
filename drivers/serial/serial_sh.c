@@ -15,12 +15,14 @@
 #include <serial.h>
 #include <linux/compiler.h>
 #include <dm/platform_data/serial_sh.h>
-#include <linux/delay.h>
 #include "serial_sh.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#if defined(CONFIG_CPU_SH7780)
+#if defined(CONFIG_CPU_SH7760) || \
+	defined(CONFIG_CPU_SH7780) || \
+	defined(CONFIG_CPU_SH7785) || \
+	defined(CONFIG_CPU_SH7786)
 static int scif_rxfill(struct uart_port *port)
 {
 	return sci_in(port, SCRFDR) & 0xff;
@@ -36,6 +38,14 @@ static int scif_rxfill(struct uart_port *port)
 		/* SCIF2 */
 		return sci_in(port, SCFDR) & SCIF2_RFDC_MASK;
 	}
+}
+#elif defined(CONFIG_ARCH_SH7372)
+static int scif_rxfill(struct uart_port *port)
+{
+	if (port->type == PORT_SCIFA)
+		return sci_in(port, SCFDR) & SCIF_RFDC_MASK;
+	else
+		return sci_in(port, SCRFDR);
 }
 #else
 static int scif_rxfill(struct uart_port *port)
@@ -53,9 +63,6 @@ static void sh_serial_init_generic(struct uart_port *port)
 	sci_out(port, SCFCR, SCFCR_RFRST|SCFCR_TFRST);
 	sci_in(port, SCFCR);
 	sci_out(port, SCFCR, 0);
-#if defined(CONFIG_RZA1)
-	sci_out(port, SCSPTR, 0x0003);
-#endif
 }
 
 static void
@@ -116,10 +123,7 @@ static int serial_getc_check(struct uart_port *port)
 		handle_error(port);
 	if (sci_in(port, SCLSR) & SCxSR_ORER(port))
 		handle_error(port);
-	status &= (SCIF_DR | SCxSR_RDxF(port));
-	if (status)
-		return status;
-	return scif_rxfill(port);
+	return status & (SCIF_DR | SCxSR_RDxF(port));
 }
 
 static int sh_serial_getc_generic(struct uart_port *port)
@@ -214,7 +218,7 @@ static int sh_serial_ofdata_to_platdata(struct udevice *dev)
 	fdt_addr_t addr;
 	int ret;
 
-	addr = dev_read_addr(dev);
+	addr = devfdt_get_addr(dev);
 	if (!addr)
 		return -EINVAL;
 

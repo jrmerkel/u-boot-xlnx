@@ -8,11 +8,8 @@
 
 #include <common.h>
 #include <dm.h>
-#include <log.h>
-#include <malloc.h>
 #include <reset-uclass.h>
 #include <regmap.h>
-#include <linux/bitops.h>
 
 #define REG_COUNT	8
 #define BITS_PER_REG	32
@@ -65,14 +62,13 @@ static int meson_reset_deassert(struct reset_ctl *reset_ctl)
 
 struct reset_ops meson_reset_ops = {
 	.request = meson_reset_request,
-	.rfree = meson_reset_free,
+	.free = meson_reset_free,
 	.rst_assert = meson_reset_assert,
 	.rst_deassert = meson_reset_deassert,
 };
 
 static const struct udevice_id meson_reset_ids[] = {                          
 	{ .compatible = "amlogic,meson-gxbb-reset" },                                  
-	{ .compatible = "amlogic,meson-axg-reset" },
 	{ }                                                                     
 };  
 

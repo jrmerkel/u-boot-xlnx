@@ -4,14 +4,10 @@
  */
 
 #include <common.h>
-#include <bootstage.h>
 #include <dm.h>
 #include <errno.h>
-#include <init.h>
 #include <timer.h>
 #include <asm/io.h>
-#include <linux/bitops.h>
-#include <linux/err.h>
 
 #define CNT_CNTRL_RESET		BIT(4)
 
@@ -57,11 +53,13 @@ ulong timer_get_boot_us(void)
 }
 #endif
 
-static u64 cadence_ttc_get_count(struct udevice *dev)
+static int cadence_ttc_get_count(struct udevice *dev, u64 *count)
 {
 	struct cadence_ttc_priv *priv = dev_get_priv(dev);
 
-	return readl(&priv->regs->counter_val1);
+	*count = readl(&priv->regs->counter_val1);
+
+	return 0;
 }
 
 static int cadence_ttc_probe(struct udevice *dev)

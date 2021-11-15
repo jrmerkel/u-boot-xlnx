@@ -12,7 +12,6 @@
  */
 
 #include <common.h>
-#include <asm-offsets.h>
 
 #include <linux/kbuild.h>
 
@@ -39,8 +38,6 @@ int main(void)
 	DEFINE(GD_START_ADDR_SP, offsetof(struct global_data, start_addr_sp));
 
 	DEFINE(GD_NEW_GD, offsetof(struct global_data, new_gd));
-
-	DEFINE(GD_ENV_ADDR, offsetof(struct global_data, env_addr));
 
 	return 0;
 }

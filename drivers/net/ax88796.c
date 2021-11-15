@@ -3,7 +3,6 @@
  * (c) 2007 Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
  */
 #include <common.h>
-#include <linux/delay.h>
 #include "ax88796.h"
 
 /*

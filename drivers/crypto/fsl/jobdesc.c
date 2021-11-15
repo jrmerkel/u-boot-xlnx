@@ -8,12 +8,10 @@
  */
 
 #include <common.h>
-#include <cpu_func.h>
 #include <fsl_sec.h>
 #include "desc_constr.h"
 #include "jobdesc.h"
 #include "rsa_caam.h"
-#include <asm/cache.h>
 
 #if defined(CONFIG_MX6) || defined(CONFIG_MX7)
 /*!
@@ -102,8 +100,8 @@ int caam_page_alloc(uint8_t page_num, uint8_t partition_num)
 
 	/* if the page is not owned => problem */
 	if ((temp_reg & SMCSJR_PO) != PAGE_OWNED) {
-		printf("Allocation of page %u in partition %u failed 0x%X\n",
-		       page_num, partition_num, temp_reg);
+		printf("Allocation of page %d in partition %d failed 0x%X\n",
+		       temp_reg, page_num, partition_num);
 
 		return ERROR_IN_PAGE_ALLOC;
 	}
@@ -258,7 +256,7 @@ void inline_cnstr_jobdesc_blob_decap(uint32_t *desc, uint8_t *key_idnfr,
  * Descriptor to instantiate RNG State Handle 0 in normal mode and
  * load the JDKEK, TDKEK and TDSK registers
  */
-void inline_cnstr_jobdesc_rng_instantiation(u32 *desc, int handle, int do_sk)
+void inline_cnstr_jobdesc_rng_instantiation(uint32_t *desc, int handle)
 {
 	u32 *jump_cmd;
 
@@ -266,11 +264,10 @@ void inline_cnstr_jobdesc_rng_instantiation(u32 *desc, int handle, int do_sk)
 
 	/* INIT RNG in non-test mode */
 	append_operation(desc, OP_TYPE_CLASS1_ALG | OP_ALG_ALGSEL_RNG |
-			 (handle << OP_ALG_AAI_SHIFT) | OP_ALG_AS_INIT |
-			 OP_ALG_PR_ON);
+			(handle << OP_ALG_AAI_SHIFT) | OP_ALG_AS_INIT);
 
 	/* For SH0, Secure Keys must be generated as well */
-	if (!handle && do_sk) {
+	if (handle == 0) {
 		/* wait for done */
 		jump_cmd = append_jump(desc, JUMP_CLASS_CLASS1);
 		set_jump_tgt_here(desc, jump_cmd);
@@ -285,25 +282,6 @@ void inline_cnstr_jobdesc_rng_instantiation(u32 *desc, int handle, int do_sk)
 		append_operation(desc, OP_TYPE_CLASS1_ALG | OP_ALG_ALGSEL_RNG |
 				OP_ALG_RNG4_SK);
 	}
-}
-
-/* Descriptor for deinstantiation of the RNG block. */
-void inline_cnstr_jobdesc_rng_deinstantiation(u32 *desc, int handle)
-{
-	init_job_desc(desc, 0);
-
-	append_operation(desc, OP_TYPE_CLASS1_ALG | OP_ALG_ALGSEL_RNG |
-			 (handle << OP_ALG_AAI_SHIFT) | OP_ALG_AS_INITFINAL);
-}
-
-void inline_cnstr_jobdesc_rng(u32 *desc, void *data_out, u32 size)
-{
-	dma_addr_t dma_data_out = virt_to_phys(data_out);
-
-	init_job_desc(desc, 0);
-	append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG |
-			 OP_ALG_PR_ON);
-	append_fifo_store(desc, dma_data_out, size, FIFOST_TYPE_RNGSTORE);
 }
 
 /* Change key size to bytes form bits in calling function*/

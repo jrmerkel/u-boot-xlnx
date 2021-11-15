@@ -20,7 +20,6 @@
  */
 
 #include <common.h>
-#include <hang.h>
 #include <asm/arch/pxa-regs.h>
 #include <asm/arch/regs-uart.h>
 #include <asm/io.h>

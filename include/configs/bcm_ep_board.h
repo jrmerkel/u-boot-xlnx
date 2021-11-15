@@ -36,8 +36,13 @@
  */
 #define CONFIG_SYS_INIT_SP_ADDR		CONFIG_SYS_TEXT_BASE
 
+/* allow to overwrite serial and ethaddr */
+#define CONFIG_ENV_OVERWRITE
+
 /* Serial Info */
 #define CONFIG_SYS_NS16550_SERIAL
+
+#define CONFIG_ENV_SIZE			0x2000
 
 /* console configuration */
 #define CONFIG_SYS_CBSIZE		1024	/* Console buffer size */
@@ -46,6 +51,11 @@
 
 /* version string, parser, etc */
 
+#define CONFIG_MX_CYCLIC
+
 /* Enable Time Command */
+
+/* Misc utility code */
+#define CONFIG_BOUNCE_BUFFER
 
 #endif /* __BCM_EP_BOARD_H */

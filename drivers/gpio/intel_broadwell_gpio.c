@@ -7,7 +7,6 @@
 #include <dm.h>
 #include <errno.h>
 #include <fdtdec.h>
-#include <log.h>
 #include <pch.h>
 #include <pci.h>
 #include <syscon.h>

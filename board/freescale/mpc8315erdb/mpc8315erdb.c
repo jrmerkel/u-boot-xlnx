@@ -9,9 +9,6 @@
 #include <common.h>
 #include <hwconfig.h>
 #include <i2c.h>
-#include <init.h>
-#include <net.h>
-#include <linux/delay.h>
 #include <linux/libfdt.h>
 #include <fdt_support.h>
 #include <pci.h>
@@ -161,7 +158,7 @@ void pci_init_board(void)
 }
 
 #if defined(CONFIG_OF_BOARD_SETUP)
-void fdt_tsec1_fixup(void *fdt, struct bd_info *bd)
+void fdt_tsec1_fixup(void *fdt, bd_t *bd)
 {
 	const char disabled[] = "disabled";
 	const char *path;
@@ -190,7 +187,7 @@ void fdt_tsec1_fixup(void *fdt, struct bd_info *bd)
 	do_fixup_by_path(fdt, path, "status", disabled, sizeof(disabled), 1);
 }
 
-int ft_board_setup(void *blob, struct bd_info *bd)
+int ft_board_setup(void *blob, bd_t *bd)
 {
 	ft_cpu_setup(blob, bd);
 #ifdef CONFIG_PCI
@@ -203,7 +200,7 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 }
 #endif
 
-int board_eth_init(struct bd_info *bis)
+int board_eth_init(bd_t *bis)
 {
 	cpu_eth_init(bis);	/* Initialize TSECs first */
 	return pci_eth_init(bis);

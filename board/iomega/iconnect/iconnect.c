@@ -6,7 +6,6 @@
  */
 
 #include <common.h>
-#include <init.h>
 #include <miiphy.h>
 #include <asm/arch/cpu.h>
 #include <asm/arch/soc.h>

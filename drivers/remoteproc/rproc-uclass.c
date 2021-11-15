@@ -7,7 +7,6 @@
 #include <common.h>
 #include <errno.h>
 #include <fdtdec.h>
-#include <log.h>
 #include <malloc.h>
 #include <remoteproc.h>
 #include <asm/io.h>

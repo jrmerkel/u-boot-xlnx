@@ -7,11 +7,9 @@
 #include <common.h>
 #include <dm.h>
 #include <errno.h>
-#include <log.h>
 #include <malloc.h>
 #include <spi.h>
 #include <fdtdec.h>
-#include <time.h>
 #include <asm/arch/clk.h>
 #include <asm/arch/clock.h>
 #include <asm/arch/cpu.h>
@@ -19,7 +17,6 @@
 #include <asm/arch/pinmux.h>
 #include <asm/arch/spi.h>
 #include <asm/io.h>
-#include <linux/delay.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -257,7 +254,7 @@ static int exynos_spi_ofdata_to_platdata(struct udevice *bus)
 	const void *blob = gd->fdt_blob;
 	int node = dev_of_offset(bus);
 
-	plat->regs = dev_read_addr_ptr(bus);
+	plat->regs = (struct exynos_spi *)devfdt_get_addr(bus);
 	plat->periph_id = pinmux_decode_periph_id(blob, node);
 
 	if (plat->periph_id == PERIPH_ID_NONE) {

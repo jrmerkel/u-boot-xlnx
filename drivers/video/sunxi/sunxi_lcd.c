@@ -7,7 +7,6 @@
 
 #include <common.h>
 #include <display.h>
-#include <log.h>
 #include <video_bridge.h>
 #include <backlight.h>
 #include <dm.h>

@@ -8,7 +8,6 @@
 #include <asm/io.h>
 #include <asm/arch/cpu.h>
 #include <asm/arch/soc.h>
-#include <linux/delay.h>
 
 #include "high_speed_env_spec.h"
 #include "sys_env_lib.h"
@@ -533,7 +532,7 @@ struct op_params pex_and_usb3_tx_config_params3[] = {
 struct op_params pex_by4_config_params[] = {
 	/* unit_base_reg, unit_offset, mask, data, wait_time, num_of_loops */
 	{GLOBAL_CLK_SRC_HI, 0x800, 0x7, {0x5, 0x0, 0x0, 0x2}, 0, 0},
-	/* Lane Alignment enable */
+	/* Lane Alignement enable */
 	{LANE_ALIGN_REG0, 0x800, 0x1000, {0x0, 0x0, 0x0, 0x0}, 0, 0},
 	/* Max PLL phy config */
 	{CALIBRATION_CTRL_REG, 0x800, 0x1000, {0x1000, 0x1000, 0x1000, 0x1000},
@@ -672,29 +671,12 @@ struct op_params usb2_power_up_params[] = {
 	{0xc200c, 0x0 /*NA*/, 0x1000000, {0x1000000}, 0, 0},
 	/* Phy0 register 3  - TX Channel control 0 */
 	{0xc400c, 0x0 /*NA*/, 0x1000000, {0x1000000}, 0, 0},
-	/* Decrease the amplitude of the low speed eye to meet the spec */
-	{0xc000c, 0x0 /*NA*/, 0xf000, {0x1000}, 0, 0},
-	{0xc200c, 0x0 /*NA*/, 0xf000, {0x1000}, 0, 0},
-	{0xc400c, 0x0 /*NA*/, 0xf000, {0x1000}, 0, 0},
-	/* Change the High speed impedance threshold */
-	{0xc0008, 0x0 /*NA*/, 0x700, {CONFIG_ARMADA_38X_HS_IMPEDANCE_THRESH << 8}, 0, 0},
-	{0xc2008, 0x0 /*NA*/, 0x700, {CONFIG_ARMADA_38X_HS_IMPEDANCE_THRESH << 8}, 0, 0},
-	{0xc4008, 0x0 /*NA*/, 0x700, {CONFIG_ARMADA_38X_HS_IMPEDANCE_THRESH << 8}, 0, 0},
-	/* Change the squelch level of the receiver to meet the receiver electrical measurements (squelch and receiver sensitivity tests) */
-	{0xc0014, 0x0 /*NA*/, 0xf, {0x8}, 0, 0},
-	{0xc2014, 0x0 /*NA*/, 0xf, {0x8}, 0, 0},
-	{0xc4014, 0x0 /*NA*/, 0xf, {0x8}, 0, 0},
-	/* Check PLLCAL_DONE is set and IMPCAL_DONE is set */
+	/* check PLLCAL_DONE is set and IMPCAL_DONE is set */
 	{0xc0008, 0x0 /*NA*/, 0x80800000, {0x80800000}, 1, 1000},
-	/* Check REG_SQCAL_DONE  is set */
+	/* check REG_SQCAL_DONE  is set */
 	{0xc0018, 0x0 /*NA*/, 0x80000000, {0x80000000}, 1, 1000},
-	/* Check PLL_READY  is set */
-	{0xc0000, 0x0 /*NA*/, 0x80000000, {0x80000000}, 1, 1000},
-	/* Start calibrate of high seed impedance */
-	{0xc0008, 0x0 /*NA*/, 0x2000, {0x2000}, 0, 0},
-	{0x0, 0x0 /*NA*/, 0x0, {0x0}, 10, 0},
-	/* De-assert  the calibration signal */
-	{0xc0008, 0x0 /*NA*/, 0x2000, {0x0}, 0, 0},
+	/* check PLL_READY  is set */
+	{0xc0000, 0x0 /*NA*/, 0x80000000, {0x80000000}, 1, 1000}
 };
 
 /*
@@ -1384,16 +1366,16 @@ static void print_topology_details(const struct serdes_map *serdes_map,
 
 	DEBUG_INIT_S("board SerDes lanes topology details:\n");
 
-	DEBUG_INIT_S(" | Lane # | Speed |  Type       |\n");
+	DEBUG_INIT_S(" | Lane #  | Speed |  Type       |\n");
 	DEBUG_INIT_S(" --------------------------------\n");
 	for (lane_num = 0; lane_num < count; lane_num++) {
 		if (serdes_map[lane_num].serdes_type == DEFAULT_SERDES)
 			continue;
 		DEBUG_INIT_S(" |   ");
 		DEBUG_INIT_D(hws_get_physical_serdes_num(lane_num), 1);
-		DEBUG_INIT_S("    |   ");
+		DEBUG_INIT_S("    |  ");
 		DEBUG_INIT_D(serdes_map[lane_num].serdes_speed, 2);
-		DEBUG_INIT_S("   | ");
+		DEBUG_INIT_S("   |  ");
 		DEBUG_INIT_S((char *)
 			     serdes_type_to_string[serdes_map[lane_num].
 						   serdes_type]);

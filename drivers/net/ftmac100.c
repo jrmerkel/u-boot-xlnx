@@ -8,11 +8,8 @@
 
 #include <config.h>
 #include <common.h>
-#include <cpu_func.h>
-#include <env.h>
 #include <malloc.h>
 #include <net.h>
-#include <linux/delay.h>
 #include <linux/io.h>
 
 #include "ftmac100.h"
@@ -240,7 +237,7 @@ static void ftmac100_halt(struct eth_device *dev)
 	return _ftmac100_halt(priv);
 }
 
-static int ftmac100_init(struct eth_device *dev, struct bd_info *bd)
+static int ftmac100_init(struct eth_device *dev, bd_t *bd)
 {
 	struct ftmac100_data *priv = dev->priv;
 	return _ftmac100_init(priv , dev->enetaddr);
@@ -278,7 +275,7 @@ static int ftmac100_send(struct eth_device *dev, void *packet, int length)
 	return _ftmac100_send(priv , packet , length);
 }
 
-int ftmac100_initialize (struct bd_info *bd)
+int ftmac100_initialize (bd_t *bd)
 {
 	struct eth_device *dev;
 	struct ftmac100_data *priv;
@@ -398,7 +395,7 @@ static int ftmac100_ofdata_to_platdata(struct udevice *dev)
 	struct ftmac100_data *priv = dev_get_priv(dev);
 	struct eth_pdata *pdata = dev_get_platdata(dev);
 	const char *mac;
-	pdata->iobase = dev_read_addr(dev);
+	pdata->iobase = devfdt_get_addr(dev);
 	priv->iobase = pdata->iobase;
 	mac = dtbmacaddr(0);
 	if (mac)

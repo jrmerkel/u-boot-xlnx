@@ -8,20 +8,14 @@
 #include <common.h>
 #include <command.h>
 #include <dm.h>
-#include <log.h>
 #include <net.h>
 #include <rtc.h>
 
-#include <net/sntp.h>
+#include "sntp.h"
 
 #define SNTP_TIMEOUT 10000UL
 
 static int sntp_our_port;
-
-/* NTP server IP address */
-struct in_addr	net_ntp_server;
-/* offset time from UTC */
-int		net_ntp_time_offset;
 
 static void sntp_send(void)
 {
@@ -98,25 +92,7 @@ static void sntp_handler(uchar *pkt, unsigned dest, struct in_addr sip,
 	net_set_state(NETLOOP_SUCCESS);
 }
 
-/*
- * SNTP:
- *
- *	Prerequisites:	- own ethernet address
- *			- own IP address
- *	We want:	- network time
- *	Next step:	none
- */
-int sntp_prereq(void *data)
-{
-	if (net_ntp_server.s_addr == 0) {
-		puts("*** ERROR: NTP server address not given\n");
-		return 1;
-	}
-
-	return 0;
-}
-
-int sntp_start(void *data)
+void sntp_start(void)
 {
 	debug("%s\n", __func__);
 
@@ -125,6 +101,4 @@ int sntp_start(void *data)
 	memset(net_server_ethaddr, 0, sizeof(net_server_ethaddr));
 
 	sntp_send();
-
-	return 0;
 }

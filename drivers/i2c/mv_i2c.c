@@ -19,9 +19,7 @@
 #include <common.h>
 #include <dm.h>
 #include <i2c.h>
-#include <log.h>
 #include <asm/io.h>
-#include <linux/delay.h>
 #include "mv_i2c.h"
 
 /* All transfers are described by this data structure */
@@ -436,7 +434,7 @@ void i2c_init(int speed, int slaveaddr)
 	base_glob = (struct mv_i2c *)CONFIG_MV_I2C_REG;
 #endif
 
-	if (speed > I2C_SPEED_STANDARD_RATE)
+	if (speed > 100000)
 		val = ICR_FM;
 	else
 		val = ICR_SM;
@@ -567,7 +565,7 @@ static int mv_i2c_set_bus_speed(struct udevice *bus, unsigned int speed)
 	struct mv_i2c_priv *priv = dev_get_priv(bus);
 	u32 val;
 
-	if (speed > I2C_SPEED_STANDARD_RATE)
+	if (speed > 100000)
 		val = ICR_FM;
 	else
 		val = ICR_SM;
@@ -580,7 +578,7 @@ static int mv_i2c_probe(struct udevice *bus)
 {
 	struct mv_i2c_priv *priv = dev_get_priv(bus);
 
-	priv->base = dev_read_addr_ptr(bus);
+	priv->base = (void *)devfdt_get_addr_ptr(bus);
 
 	return 0;
 }

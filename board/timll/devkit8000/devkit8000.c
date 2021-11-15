@@ -17,9 +17,7 @@
  */
 #include <common.h>
 #include <dm.h>
-#include <env.h>
-#include <init.h>
-#include <malloc.h>
+#include <environment.h>
 #include <ns16550.h>
 #include <twl4030.h>
 #include <asm/io.h>
@@ -134,7 +132,7 @@ void set_muxconf_regs(void)
 }
 
 #if defined(CONFIG_MMC)
-int board_mmc_init(struct bd_info *bis)
+int board_mmc_init(bd_t *bis)
 {
 	return omap_mmc_init(0, 0, 0, -1, -1);
 }
@@ -152,7 +150,7 @@ void board_mmc_power_init(void)
  * Routine: board_eth_init
  * Description: Setting up the Ethernet hardware.
  */
-int board_eth_init(struct bd_info *bis)
+int board_eth_init(bd_t *bis)
 {
 	return dm9000_initialize(bis);
 }

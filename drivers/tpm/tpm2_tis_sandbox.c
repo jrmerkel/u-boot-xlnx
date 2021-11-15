@@ -9,8 +9,7 @@
 #include <tpm-v2.h>
 #include <asm/state.h>
 #include <asm/unaligned.h>
-#include <linux/bitops.h>
-#include <u-boot/crc.h>
+#include <linux/crc8.h>
 
 /* Hierarchies */
 enum tpm2_hierarchy {

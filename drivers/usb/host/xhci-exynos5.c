@@ -15,8 +15,6 @@
 #include <common.h>
 #include <dm.h>
 #include <fdtdec.h>
-#include <log.h>
-#include <linux/delay.h>
 #include <linux/libfdt.h>
 #include <malloc.h>
 #include <usb.h>
@@ -29,7 +27,7 @@
 #include <linux/compat.h>
 #include <linux/usb/dwc3.h>
 
-#include <usb/xhci.h>
+#include "xhci.h"
 
 /* Declare global data pointer */
 DECLARE_GLOBAL_DATA_PTR;
@@ -62,7 +60,7 @@ static int xhci_usb_ofdata_to_platdata(struct udevice *dev)
 	/*
 	 * Get the base address for XHCI controller from the device node
 	 */
-	plat->hcd_base = dev_read_addr(dev);
+	plat->hcd_base = devfdt_get_addr(dev);
 	if (plat->hcd_base == FDT_ADDR_T_NONE) {
 		debug("Can't get the XHCI register base address\n");
 		return -ENXIO;

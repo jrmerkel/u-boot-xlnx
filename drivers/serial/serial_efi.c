@@ -11,7 +11,6 @@
 #include <efi_api.h>
 #include <errno.h>
 #include <fdtdec.h>
-#include <log.h>
 #include <linux/compiler.h>
 #include <asm/io.h>
 #include <serial.h>

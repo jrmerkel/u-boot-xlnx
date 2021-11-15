@@ -12,8 +12,6 @@
 #include <dm.h>
 #include <ram.h>
 #include <asm/io.h>
-#include <linux/bitops.h>
-#include <linux/delay.h>
 
 /* EMI */
 #define EMI_CONA			0x000

@@ -19,11 +19,11 @@
 
 	memory@0 {
 		device_type = "memory";
-		reg = <0x0 0x20000000>;
+		reg = <0x0 0x10000000>;
 	};
 
 	chosen {
-		bootargs = "";
+		bootargs = "mem=256M uio_pdrv_genirq.of_id=generic-uio";
 		stdout-path = "serial0:115200n8";
 	};
 
@@ -65,23 +65,23 @@
 		m25p,fast-read;
 		#address-cells = <1>;
 		#size-cells = <1>;
-		partition@0 {
+		partition@qspi-fsbl-uboot {
 			label = "qspi-fsbl-uboot";
 			reg = <0x0 0x100000>;
 		};
-		partition@100000 {
+		partition@qspi-linux {
 			label = "qspi-linux";
 			reg = <0x100000 0x500000>;
 		};
-		partition@600000 {
+		partition@qspi-device-tree {
 			label = "qspi-device-tree";
 			reg = <0x600000 0x20000>;
 		};
-		partition@620000 {
+		partition@qspi-rootfs {
 			label = "qspi-rootfs";
 			reg = <0x620000 0x5E0000>;
 		};
-		partition@c00000 {
+		partition@qspi-bitstream {
 			label = "qspi-bitstream";
 			reg = <0xC00000 0x400000>;
 		};

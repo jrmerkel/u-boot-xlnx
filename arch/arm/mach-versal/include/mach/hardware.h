@@ -3,10 +3,6 @@
  * Copyright 2016 - 2018 Xilinx, Inc.
  */
 
-#ifndef __ASSEMBLY__
-#include <linux/bitops.h>
-#endif
-
 #define VERSAL_CRL_APB_BASEADDR	0xFF5E0000
 
 #define CRL_APB_TIMESTAMP_REF_CTRL_CLKACT_BIT	BIT(25)
@@ -56,11 +52,16 @@ struct rpu_regs {
 
 #define rpu_base ((struct rpu_regs *)VERSAL_RPU_BASEADDR)
 
-#define VERSAL_CRP_BASEADDR	0xF1260000
+#define VERSAL_PMC_TAP_BASEADDR	0xF11A0000
 
-#define VERSAL_SLCR_BASEADDR	0xF1060000
-#define VERSAL_AXI_MUX_SEL	(VERSAL_SLCR_BASEADDR + 0x504)
-#define VERSAL_OSPI_LINEAR_MODE	BIT(1)
+struct pmc_tap_regs {
+	u32 idcode; /* 0x0 */
+	u32 version; /* 0x4 */
+};
+
+#define pmc_base_base ((struct pmc_tap_regs *)VERSAL_PMC_TAP_BASEADDR)
+
+#define VERSAL_CRP_BASEADDR	0xF1260000
 
 struct crp_regs {
 	u32 reserved0[128];
@@ -68,10 +69,6 @@ struct crp_regs {
 };
 
 #define crp_base ((struct crp_regs *)VERSAL_CRP_BASEADDR)
-
-#define VERSAL_PS_PMC_VERSION	0xF11A0004
-#define VERSAL_PS_VER_MASK	GENMASK(7, 0)
-#define VERSAL_PS_VER_SHIFT	12
 
 /* Bootmode setting values */
 #define BOOT_MODES_MASK	0x0000000F

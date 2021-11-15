@@ -6,7 +6,6 @@
  */
 
 #include <common.h>
-#include <init.h>
 #include <asm/arch/sys_proto.h>
 
 DECLARE_GLOBAL_DATA_PTR;

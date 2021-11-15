@@ -6,9 +6,7 @@
 
 #include <common.h>
 #include <i2c.h>
-#include <init.h>
 #include <miiphy.h>
-#include <net.h>
 #include <netdev.h>
 #include <asm/io.h>
 #include <asm/arch/cpu.h>
@@ -18,6 +16,10 @@
 #include <../serdes/a38x/high_speed_env_spec.h>
 
 DECLARE_GLOBAL_DATA_PTR;
+
+#define ETH_PHY_CTRL_REG		0
+#define ETH_PHY_CTRL_POWER_DOWN_BIT	11
+#define ETH_PHY_CTRL_POWER_DOWN_MASK	BIT(ETH_PHY_CTRL_POWER_DOWN_BIT)
 
 /*
  * Those values and defines are taken from the Marvell U-Boot version
@@ -122,7 +124,7 @@ int checkboard(void)
 	return 0;
 }
 
-int board_eth_init(struct bd_info *bis)
+int board_eth_init(bd_t *bis)
 {
 	cpu_eth_init(bis); /* Built in controller(s) come first */
 	return pci_eth_init(bis);

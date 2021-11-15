@@ -11,7 +11,6 @@
 #include <timer.h>
 #include <asm/io.h>
 #include <asm/arch/clock.h>
-#include <linux/bitops.h>
 
 /* Timer register bits */
 #define TCLR_START			BIT(0)	/* Start=1 */
@@ -48,11 +47,13 @@ struct omap_timer_priv {
 	struct omap_gptimer_regs *regs;
 };
 
-static u64 omap_timer_get_count(struct udevice *dev)
+static int omap_timer_get_count(struct udevice *dev, u64 *count)
 {
 	struct omap_timer_priv *priv = dev_get_priv(dev);
 
-	return timer_conv_64(readl(&priv->regs->tcrr));
+	*count = timer_conv_64(readl(&priv->regs->tcrr));
+
+	return 0;
 }
 
 static int omap_timer_probe(struct udevice *dev)
@@ -77,7 +78,7 @@ static int omap_timer_ofdata_to_platdata(struct udevice *dev)
 {
 	struct omap_timer_priv *priv = dev_get_priv(dev);
 
-	priv->regs = map_physmem(dev_read_addr(dev),
+	priv->regs = map_physmem(devfdt_get_addr(dev),
 				 sizeof(struct omap_gptimer_regs), MAP_NOCACHE);
 
 	return 0;

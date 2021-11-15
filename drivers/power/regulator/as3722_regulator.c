@@ -9,7 +9,6 @@
 #include <common.h>
 #include <dm.h>
 #include <errno.h>
-#include <log.h>
 #include <power/as3722.h>
 #include <power/pmic.h>
 #include <power/regulator.h>

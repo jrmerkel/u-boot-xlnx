@@ -8,7 +8,6 @@
  * Author: Ivan Khoronzhuk <ivan.khoronzhuk@ti.com>
  */
 
-#include <asm/cache.h>
 #include <asm/io.h>
 #include <common.h>
 #include <dm.h>
@@ -546,7 +545,7 @@ static int ti_edma3_ofdata_to_platdata(struct udevice *dev)
 {
 	struct ti_edma3_priv *priv = dev_get_priv(dev);
 
-	priv->base = dev_read_addr(dev);
+	priv->base = devfdt_get_addr(dev);
 
 	return 0;
 }

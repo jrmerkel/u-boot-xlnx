@@ -14,16 +14,12 @@
  * Sanghee Kim <sh0130.kim@samsung.com>
  */
 
-#include <command.h>
 #include <errno.h>
 #include <common.h>
 #include <console.h>
-#include <init.h>
-#include <log.h>
 #include <malloc.h>
 #include <memalign.h>
 #include <version.h>
-#include <linux/delay.h>
 #include <linux/usb/ch9.h>
 #include <linux/usb/gadget.h>
 #include <linux/usb/composite.h>
@@ -177,7 +173,7 @@ static long long int download_head(unsigned long long total,
 					transfer_buffer, THOR_STORE_UNIT_SIZE,
 					(*cnt)++);
 			if (ret) {
-				pr_err("DFU write failed [%d] cnt: %d\n",
+				pr_err("DFU write failed [%d] cnt: %d",
 				      ret, *cnt);
 				return ret;
 			}
@@ -227,14 +223,14 @@ static int download_tail(long long int left, int cnt)
 
 	transfer_buffer = dfu_get_buf(dfu_entity);
 	if (!transfer_buffer) {
-		pr_err("Transfer buffer not allocated!\n");
+		pr_err("Transfer buffer not allocated!");
 		return -ENXIO;
 	}
 
 	if (left) {
 		ret = dfu_write(dfu_entity, transfer_buffer, left, cnt++);
 		if (ret) {
-			pr_err("DFU write failed[%d]: left: %llu\n", ret, left);
+			pr_err("DFU write failed [%d]: left: %llu", ret, left);
 			return ret;
 		}
 	}
@@ -248,7 +244,7 @@ static int download_tail(long long int left, int cnt)
 	 */
 	ret = dfu_flush(dfu_entity, transfer_buffer, 0, cnt);
 	if (ret)
-		pr_err("DFU flush failed!\n");
+		pr_err("DFU flush failed!");
 
 	return ret;
 }
@@ -293,7 +289,7 @@ static long long int process_rqt_download(const struct rqt_box *rqt)
 
 		alt_setting_num = dfu_get_alt(f_name);
 		if (alt_setting_num < 0) {
-			pr_err("Alt setting [%d] to write not found!\n",
+			pr_err("Alt setting [%d] to write not found!",
 			      alt_setting_num);
 			rsp->ack = -ENODEV;
 			ret = rsp->ack;
@@ -319,7 +315,7 @@ static long long int process_rqt_download(const struct rqt_box *rqt)
 		debug("DL EXIT\n");
 		break;
 	default:
-		pr_err("Operation not supported: %d\n", rqt->rqt_data);
+		pr_err("Operation not supported: %d", rqt->rqt_data);
 		ret = -ENOTSUPP;
 	}
 
@@ -350,7 +346,7 @@ static int process_data(void)
 		puts("RQT: UPLOAD not supported!\n");
 		break;
 	default:
-		pr_err("unknown request (%d)\n", rqt->rqt);
+		pr_err("unknown request (%d)", rqt->rqt);
 	}
 
 	return ret;
@@ -549,7 +545,7 @@ static int thor_rx_data(void)
 
 		status = usb_ep_queue(dev->out_ep, dev->out_req, 0);
 		if (status) {
-			pr_err("kill %s:  resubmit %d bytes --> %d\n",
+			pr_err("kill %s:  resubmit %d bytes --> %d",
 			      dev->out_ep->name, dev->out_req->length, status);
 			usb_ep_set_halt(dev->out_ep);
 			return -EAGAIN;
@@ -583,7 +579,7 @@ static void thor_tx_data(unsigned char *data, int len)
 
 	status = usb_ep_queue(dev->in_ep, dev->in_req, 0);
 	if (status) {
-		pr_err("kill %s:  resubmit %d bytes --> %d\n",
+		pr_err("kill %s:  resubmit %d bytes --> %d",
 		      dev->in_ep->name, dev->in_req->length, status);
 		usb_ep_set_halt(dev->in_ep);
 	}
@@ -616,7 +612,7 @@ static void thor_rx_tx_complete(struct usb_ep *ep, struct usb_request *req)
 	case -ESHUTDOWN:		/* disconnect from host */
 	case -EREMOTEIO:                /* short read */
 	case -EOVERFLOW:
-		pr_err("ERROR:%d\n", status);
+		pr_err("ERROR:%d", status);
 		break;
 	}
 
@@ -656,7 +652,7 @@ thor_func_setup(struct usb_function *f, const struct usb_ctrlrequest *ctrl)
 		break;
 
 	default:
-		pr_err("thor_setup: unknown request: %d\n", ctrl->bRequest);
+		pr_err("thor_setup: unknown request: %d", ctrl->bRequest);
 	}
 
 	if (value >= 0) {
@@ -945,13 +941,6 @@ static int thor_eps_setup(struct usb_function *f)
 	dev->out_req = req;
 	/* ACM control EP */
 	ep = dev->int_ep;
-	d = ep_desc(gadget, &hs_int_desc, &fs_int_desc);
-	debug("(d)bEndpointAddress: 0x%x\n", d->bEndpointAddress);
-
-	result = usb_ep_enable(ep, d);
-	if (result)
-		goto err;
-
 	ep->driver_data = cdev;	/* claim */
 
 	return 0;
@@ -987,7 +976,7 @@ static int thor_func_set_alt(struct usb_function *f,
 		debug("Communication Data interface\n");
 		result = thor_eps_setup(f);
 		if (result)
-			pr_err("%s: EPs setup failed!\n", __func__);
+			pr_err("%s: EPs setup failed!", __func__);
 		dev->configuration_done = 1;
 		break;
 	}

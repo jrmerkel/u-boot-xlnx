@@ -12,7 +12,6 @@
 
 #include <common.h>
 #include <dm.h>
-#include <log.h>
 #include <malloc.h>
 #include <spi.h>
 #include <spi_flash.h>
@@ -21,7 +20,6 @@
 #include <linux/errno.h>
 #include <asm/spi.h>
 #include <asm/state.h>
-#include <dm/acpi.h>
 #include <dm/device-internal.h>
 
 #ifndef CONFIG_SPI_IDLE_VAL
@@ -119,17 +117,7 @@ static int sandbox_cs_info(struct udevice *bus, uint cs,
 {
 	/* Always allow activity on CS 0 */
 	if (cs >= 1)
-		return -EINVAL;
-
-	return 0;
-}
-
-static int sandbox_spi_get_mmap(struct udevice *dev, ulong *map_basep,
-				uint *map_sizep, uint *offsetp)
-{
-	*map_basep = 0x1000;
-	*map_sizep = 0x2000;
-	*offsetp = 0x100;
+		return -ENODEV;
 
 	return 0;
 }
@@ -139,7 +127,6 @@ static const struct dm_spi_ops sandbox_spi_ops = {
 	.set_speed	= sandbox_spi_set_speed,
 	.set_mode	= sandbox_spi_set_mode,
 	.cs_info	= sandbox_cs_info,
-	.get_mmap	= sandbox_spi_get_mmap,
 };
 
 static const struct udevice_id sandbox_spi_ids[] = {
@@ -147,8 +134,8 @@ static const struct udevice_id sandbox_spi_ids[] = {
 	{ }
 };
 
-U_BOOT_DRIVER(sandbox_spi) = {
-	.name	= "sandbox_spi",
+U_BOOT_DRIVER(spi_sandbox) = {
+	.name	= "spi_sandbox",
 	.id	= UCLASS_SPI,
 	.of_match = sandbox_spi_ids,
 	.ops	= &sandbox_spi_ops,

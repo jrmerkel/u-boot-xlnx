@@ -9,10 +9,8 @@
  * cpu_init.c - low level cpu init
  */
 
-#include <asm-offsets.h>
 #include <config.h>
 #include <common.h>
-#include <init.h>
 #include <mpc86xx.h>
 #include <asm/mmu.h>
 #include <asm/fsl_law.h>

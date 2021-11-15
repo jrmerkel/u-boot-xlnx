@@ -6,9 +6,6 @@
  */
 
 #include <common.h>
-#include <clock_legacy.h>
-#include <fdt_support.h>
-#include <init.h>
 #if defined(CONFIG_OF_LIBFDT)
 #include <linux/libfdt.h>
 #endif
@@ -118,7 +115,7 @@ int misc_init_r(void)
 }
 
 #if defined(CONFIG_OF_BOARD_SETUP)
-int ft_board_setup(void *blob, struct bd_info *bd)
+int ft_board_setup(void *blob, bd_t *bd)
 {
 	ft_cpu_setup(blob, bd);
 #ifdef CONFIG_PCI

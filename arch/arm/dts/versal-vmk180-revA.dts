@@ -16,7 +16,7 @@
 
 	memory: memory@0 {
 		device_type = "memory";
-		reg = <0 0 0 0x80000000>, <0x8 0x0 0x1 0x80000000>;
+		reg = <0 0 0 0x80000000>;
 	};
 
 	chosen {
@@ -66,11 +66,7 @@
 
 &sdhci1 { /* PMC_MIO26-36/51 */
 	status = "okay";
-	xlnx,mio-bank = <1>;
-	no-1-8-v;
-	sdhci-caps-mask = <0 0x200000>;
-	sdhci-caps = <0 0>;
-	max-frequency = <19000000>;
+	xlnx,mio_bank = <1>;
 };
 
 &serial0 { /* PMC_MIO42/43 */

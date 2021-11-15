@@ -7,16 +7,12 @@
  */
 
 #include <common.h>
-#include <cpu_func.h>
-#include <init.h>
 #include <ns16550.h>
-#include <asm/cache.h>
 #include <asm/io.h>
 #include <asm/arch/msmc.h>
 #include <asm/arch/clock.h>
 #include <asm/arch/hardware.h>
 #include <asm/arch/psc_defs.h>
-#include <linux/bitops.h>
 
 #define MAX_PCI_PORTS		2
 enum pci_mode	{
@@ -208,7 +204,7 @@ void reset_cpu(ulong addr)
 
 void enable_caches(void)
 {
-#if !CONFIG_IS_ENABLED(SYS_DCACHE_OFF)
+#ifndef CONFIG_SYS_DCACHE_OFF
 	/* Enable D-cache. I-cache is already enabled in start.S */
 	dcache_enable();
 #endif

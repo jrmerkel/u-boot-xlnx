@@ -17,7 +17,6 @@
 
 #include <common.h>
 #include <errno.h>
-#include <log.h>
 #include <stdio_dev.h>
 #include <linux/ctype.h>
 #include <linux/types.h>

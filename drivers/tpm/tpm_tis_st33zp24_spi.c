@@ -15,11 +15,9 @@
 #include <common.h>
 #include <dm.h>
 #include <fdtdec.h>
-#include <log.h>
 #include <spi.h>
 #include <tpm-v1.h>
 #include <errno.h>
-#include <linux/delay.h>
 #include <linux/types.h>
 #include <asm/unaligned.h>
 #include <linux/compat.h>

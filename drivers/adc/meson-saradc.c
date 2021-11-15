@@ -14,8 +14,6 @@
 #include <regmap.h>
 #include <errno.h>
 #include <asm/io.h>
-#include <linux/bitops.h>
-#include <linux/delay.h>
 #include <linux/math64.h>
 #include <linux/bitfield.h>
 

@@ -59,12 +59,8 @@
  */
 
 #ifndef __UBOOT__
-#include <init.h>
-#include <log.h>
-#include <dm/devres.h>
 #include <linux/crc32.h>
 #include <linux/slab.h>
-#include <u-boot/crc.h>
 #else
 #include <linux/compat.h>
 #include <linux/err.h>

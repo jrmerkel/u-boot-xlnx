@@ -12,8 +12,6 @@
  */
 
 #include <common.h>
-#include <init.h>
-#include <log.h>
 #include <mvmfp.h>
 #include <asm/arch/cpu.h>
 #include <asm/arch/mfp.h>
@@ -21,7 +19,6 @@
 #include <asm/gpio.h>
 #include <miiphy.h>
 #include <asm/mach-types.h>
-#include <linux/delay.h>
 
 #ifdef CONFIG_ARMADA100_FEC
 #include <net.h>
@@ -94,7 +91,7 @@ int board_init(void)
 }
 
 #ifdef CONFIG_ARMADA100_FEC
-int board_eth_init(struct bd_info *bis)
+int board_eth_init(bd_t *bis)
 {
 	struct armd1apmu_registers *apmu_regs =
 		(struct armd1apmu_registers *)ARMD1_APMU_BASE;

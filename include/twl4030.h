@@ -654,20 +654,14 @@ static inline int twl4030_i2c_write_u8(u8 chip_no, u8 reg, u8 val)
 	return i2c_write(chip_no, reg, 1, &val, 1);
 }
 
-static inline int twl4030_i2c_read(u8 chip_no, u8 reg, u8 *val, int len)
+static inline int twl4030_i2c_read_u8(u8 chip_no, u8 reg, u8 *val)
 {
-	return i2c_read(chip_no, reg, 1, val, len);
+	return i2c_read(chip_no, reg, 1, val, 1);
 }
 #else
 int twl4030_i2c_write_u8(u8 chip_no, u8 reg, u8 val);
-int twl4030_i2c_read(u8 chip_no, u8 reg, u8 *val, int len);
+int twl4030_i2c_read_u8(u8 chip_no, u8 reg, u8 *val);
 #endif
-
-static inline int twl4030_i2c_read_u8(u8 chip_no, u8 reg, u8 *val)
-{
-	return twl4030_i2c_read(chip_no, reg, val, 1);
-}
-
 /*
  * Power
  */

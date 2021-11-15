@@ -7,23 +7,12 @@
  */
 #undef DEBUG
 
-#include <log.h>
-#include <dm/devres.h>
 #include <linux/bitops.h>
-#include <linux/bug.h>
 #include <linux/usb/composite.h>
 
 #define USB_BUFSIZ	4096
 
-/* Helper type for accessing packed u16 pointers */
-typedef struct { __le16 val; } __packed __le16_packed;
-
 static struct usb_composite_driver *composite;
-
-static inline void le16_add_cpu_packed(__le16_packed *var, u16 val)
-{
-	var->val = cpu_to_le16(le16_to_cpu(var->val) + val);
-}
 
 /**
  * usb_add_function() - add a function to a configuration
@@ -491,21 +480,20 @@ done:
  * the host side.
  */
 
-static void collect_langs(struct usb_gadget_strings **sp, void *buf)
+static void collect_langs(struct usb_gadget_strings **sp, __le16 *buf)
 {
 	const struct usb_gadget_strings	*s;
 	u16				language;
-	__le16_packed			*tmp;
-	__le16_packed			*end = (buf + 252);
+	__le16				*tmp;
 
 	while (*sp) {
 		s = *sp;
 		language = cpu_to_le16(s->language);
-		for (tmp = buf; tmp->val && tmp < end; tmp++) {
-			if (tmp->val == language)
+		for (tmp = buf; *tmp && tmp < &buf[126]; tmp++) {
+			if (*tmp == language)
 				goto repeat;
 		}
-		tmp->val = language;
+		*tmp++ = language;
 repeat:
 		sp++;
 	}
@@ -717,8 +705,7 @@ static int bos_desc(struct usb_composite_dev *cdev)
 	 */
 	usb_ext = cdev->req->buf + le16_to_cpu(bos->wTotalLength);
 	bos->bNumDeviceCaps++;
-	le16_add_cpu_packed((__le16_packed *)&bos->wTotalLength,
-			    USB_DT_USB_EXT_CAP_SIZE);
+	le16_add_cpu(&bos->wTotalLength, USB_DT_USB_EXT_CAP_SIZE);
 	usb_ext->bLength = USB_DT_USB_EXT_CAP_SIZE;
 	usb_ext->bDescriptorType = USB_DT_DEVICE_CAPABILITY;
 	usb_ext->bDevCapabilityType = USB_CAP_TYPE_EXT;
@@ -734,8 +721,7 @@ static int bos_desc(struct usb_composite_dev *cdev)
 
 		ss_cap = cdev->req->buf + le16_to_cpu(bos->wTotalLength);
 		bos->bNumDeviceCaps++;
-		le16_add_cpu_packed((__le16_packed *)&bos->wTotalLength,
-				    USB_DT_USB_SS_CAP_SIZE);
+		le16_add_cpu(&bos->wTotalLength, USB_DT_USB_SS_CAP_SIZE);
 		ss_cap->bLength = USB_DT_USB_SS_CAP_SIZE;
 		ss_cap->bDescriptorType = USB_DT_DEVICE_CAPABILITY;
 		ss_cap->bDevCapabilityType = USB_SS_CAP_TYPE;
@@ -1006,11 +992,7 @@ static void composite_unbind(struct usb_gadget *gadget)
 	 * so there's no i/o concurrency that could affect the
 	 * state protected by cdev->lock.
 	 */
-#ifdef __UBOOT__
-	assert_noisy(!cdev->config);
-#else
 	BUG_ON(cdev->config);
-#endif
 
 	while (!list_empty(&cdev->configs)) {
 		c = list_first_entry(&cdev->configs,

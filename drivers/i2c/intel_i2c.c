@@ -10,7 +10,6 @@
 #include <common.h>
 #include <dm.h>
 #include <i2c.h>
-#include <log.h>
 #include <pci.h>
 #include <asm/io.h>
 

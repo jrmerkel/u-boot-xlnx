@@ -24,10 +24,6 @@
 #include <errno.h>
 #include <spi.h>
 #include <spi-mem.h>
-#include <dm/device_compat.h>
-#include <dm/devres.h>
-#include <linux/bitops.h>
-#include <linux/bug.h>
 #include <linux/mtd/spinand.h>
 #endif
 
@@ -655,16 +651,16 @@ static int spinand_mtd_write(struct mtd_info *mtd, loff_t to,
 static bool spinand_isbad(struct nand_device *nand, const struct nand_pos *pos)
 {
 	struct spinand_device *spinand = nand_to_spinand(nand);
-	u8 marker[2] = { };
 	struct nand_page_io_req req = {
 		.pos = *pos,
-		.ooblen = sizeof(marker),
+		.ooblen = 2,
 		.ooboffs = 0,
-		.oobbuf.in = marker,
+		.oobbuf.in = spinand->oobbuf,
 		.mode = MTD_OPS_RAW,
 	};
 	int ret;
 
+	memset(spinand->oobbuf, 0, 2);
 	ret = spinand_select_target(spinand, pos->target);
 	if (ret)
 		return ret;
@@ -673,7 +669,7 @@ static bool spinand_isbad(struct nand_device *nand, const struct nand_pos *pos)
 	if (ret)
 		return ret;
 
-	if (marker[0] != 0xff || marker[1] != 0xff)
+	if (spinand->oobbuf[0] != 0xff || spinand->oobbuf[1] != 0xff)
 		return true;
 
 	return false;
@@ -702,20 +698,28 @@ static int spinand_mtd_block_isbad(struct mtd_info *mtd, loff_t offs)
 static int spinand_markbad(struct nand_device *nand, const struct nand_pos *pos)
 {
 	struct spinand_device *spinand = nand_to_spinand(nand);
-	u8 marker[2] = { };
 	struct nand_page_io_req req = {
 		.pos = *pos,
 		.ooboffs = 0,
-		.ooblen = sizeof(marker),
-		.oobbuf.out = marker,
-		.mode = MTD_OPS_RAW,
+		.ooblen = 2,
+		.oobbuf.out = spinand->oobbuf,
 	};
 	int ret;
 
+	/* Erase block before marking it bad. */
 	ret = spinand_select_target(spinand, pos->target);
 	if (ret)
 		return ret;
 
+	ret = spinand_write_enable_op(spinand);
+	if (ret)
+		return ret;
+
+	ret = spinand_erase_op(spinand, pos);
+	if (ret)
+		return ret;
+
+	memset(spinand->oobbuf, 0, 2);
 	return spinand_write_page(spinand, &req);
 }
 
@@ -829,7 +833,6 @@ static const struct spinand_manufacturer *spinand_manufacturers[] = {
 	&gigadevice_spinand_manufacturer,
 	&macronix_spinand_manufacturer,
 	&micron_spinand_manufacturer,
-	&toshiba_spinand_manufacturer,
 	&winbond_spinand_manufacturer,
 };
 
@@ -976,13 +979,13 @@ static int spinand_detect(struct spinand_device *spinand)
 
 	ret = spinand_manufacturer_detect(spinand);
 	if (ret) {
-		dev_err(spinand->slave->dev, "unknown raw ID %*phN\n",
-			SPINAND_MAX_ID_LEN, spinand->id.data);
+		dev_err(dev, "unknown raw ID %*phN\n", SPINAND_MAX_ID_LEN,
+			spinand->id.data);
 		return ret;
 	}
 
 	if (nand->memorg.ntargets > 1 && !spinand->select_target) {
-		dev_err(spinand->slave->dev,
+		dev_err(dev,
 			"SPI NANDs with more than one die must implement ->select_target()\n");
 		return -EINVAL;
 	}
@@ -1018,7 +1021,7 @@ static int spinand_noecc_ooblayout_free(struct mtd_info *mtd, int section,
 
 static const struct mtd_ooblayout_ops spinand_noecc_ooblayout = {
 	.ecc = spinand_noecc_ooblayout_ecc,
-	.rfree = spinand_noecc_ooblayout_free,
+	.free = spinand_noecc_ooblayout_free,
 };
 
 static int spinand_init(struct spinand_device *spinand)
@@ -1068,7 +1071,7 @@ static int spinand_init(struct spinand_device *spinand)
 
 	ret = spinand_manufacturer_init(spinand);
 	if (ret) {
-		dev_err(spinand->slave->dev,
+		dev_err(dev,
 			"Failed to initialize the SPI NAND chip (err = %d)\n",
 			ret);
 		goto err_free_bufs;

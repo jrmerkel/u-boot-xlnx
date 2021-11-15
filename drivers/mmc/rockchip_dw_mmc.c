@@ -9,14 +9,12 @@
 #include <dt-structs.h>
 #include <dwmmc.h>
 #include <errno.h>
-#include <log.h>
 #include <mapmem.h>
 #include <pwrseq.h>
 #include <syscon.h>
 #include <asm/gpio.h>
-#include <asm/arch-rockchip/clock.h>
-#include <asm/arch-rockchip/periph.h>
-#include <linux/delay.h>
+#include <asm/arch/clock.h>
+#include <asm/arch/periph.h>
 #include <linux/err.h>
 
 struct rockchip_mmc_plat {
@@ -74,11 +72,6 @@ static int rockchip_dwmmc_ofdata_to_platdata(struct udevice *dev)
 		return -EINVAL;
 	priv->fifo_mode = dev_read_bool(dev, "fifo-mode");
 
-#ifdef CONFIG_SPL_BUILD
-	if (!priv->fifo_mode)
-		priv->fifo_mode = dev_read_bool(dev, "u-boot,spl-fifo-mode");
-#endif
-
 	/*
 	 * 'clock-freq-min-max' is deprecated
 	 * (see https://github.com/torvalds/linux/commit/b023030f10573de738bbe8df63d43acab64c9f7b)
@@ -122,7 +115,7 @@ static int rockchip_dwmmc_probe(struct udevice *dev)
 	priv->minmax[0] = 400000;  /*  400 kHz */
 	priv->minmax[1] = dtplat->max_frequency;
 
-	ret = clk_get_by_driver_info(dev, dtplat->clocks, &priv->clk);
+	ret = clk_get_by_index_platdata(dev, 0, dtplat->clocks, &priv->clk);
 	if (ret < 0)
 		return ret;
 #else
@@ -168,7 +161,7 @@ static const struct udevice_id rockchip_dwmmc_ids[] = {
 	{ }
 };
 
-U_BOOT_DRIVER(rockchip_rk3288_dw_mshc) = {
+U_BOOT_DRIVER(rockchip_dwmmc_drv) = {
 	.name		= "rockchip_rk3288_dw_mshc",
 	.id		= UCLASS_MMC,
 	.of_match	= rockchip_dwmmc_ids,
@@ -179,9 +172,6 @@ U_BOOT_DRIVER(rockchip_rk3288_dw_mshc) = {
 	.priv_auto_alloc_size = sizeof(struct rockchip_dwmmc_priv),
 	.platdata_auto_alloc_size = sizeof(struct rockchip_mmc_plat),
 };
-
-U_BOOT_DRIVER_ALIAS(rockchip_rk3288_dw_mshc, rockchip_rk3328_dw_mshc)
-U_BOOT_DRIVER_ALIAS(rockchip_rk3288_dw_mshc, rockchip_rk3368_dw_mshc)
 
 #ifdef CONFIG_PWRSEQ
 static int rockchip_dwmmc_pwrseq_set_power(struct udevice *dev, bool enable)

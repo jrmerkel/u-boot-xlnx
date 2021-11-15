@@ -16,10 +16,10 @@
 	#size-cells = <2>;
 	model = "Xilinx Versal MINI QSPI";
 
-	clk150: clk150 {
+	clk300: clk300 {
 		compatible = "fixed-clock";
 		#clock-cells = <0x0>;
-		clock-frequency = <150000000>;
+		clock-frequency = <300000000>;
 	};
 
 	dcc: dcc {
@@ -44,11 +44,10 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			#stream-id-cells = <1>;
-			clocks = <&clk150 &clk150>;
+			clocks = <&clk300 &clk300>;
 
 			flash0: flash@0 {
-				compatible = "n25q512a", "micron,m25p80",
-					     "jedec,spi-nor";
+				compatible = "n25q512a", "micron,m25p80", "spi-flash";
 				reg = <0x0>;
 				spi-tx-bus-width = <1>;
 				spi-rx-bus-width = <4>;

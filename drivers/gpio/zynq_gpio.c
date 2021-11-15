@@ -11,7 +11,6 @@
 #include <common.h>
 #include <asm/gpio.h>
 #include <asm/io.h>
-#include <linux/bitops.h>
 #include <linux/errno.h>
 #include <dm.h>
 #include <fdtdec.h>

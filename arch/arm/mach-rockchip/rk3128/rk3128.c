@@ -2,10 +2,6 @@
 /*
  * Copyright (c) 2017 Rockchip Electronics Co., Ltd
  */
-#include <common.h>
-#include <init.h>
-
-DECLARE_GLOBAL_DATA_PTR;
 
 int arch_cpu_init(void)
 {

@@ -4,7 +4,6 @@
  * Texas Instruments, <www.ti.com>
  */
 #include <config.h>
-#include <linux/delay.h>
 
 #include <twl6030.h>
 

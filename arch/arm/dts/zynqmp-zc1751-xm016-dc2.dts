@@ -2,7 +2,7 @@
 /*
  * dts file for Xilinx ZynqMP zc1751-xm016-dc2
  *
- * (C) Copyright 2015 - 2021, Xilinx, Inc.
+ * (C) Copyright 2015 - 2018, Xilinx, Inc.
  *
  * Michal Simek <michal.simek@xilinx.com>
  */
@@ -19,7 +19,10 @@
 	compatible = "xlnx,zynqmp-zc1751", "xlnx,zynqmp";
 
 	aliases {
+		can0 = &can0;
+		can1 = &can1;
 		ethernet0 = &gem2;
+		gpio0 = &gpio;
 		i2c0 = &i2c0;
 		rtc0 = &rtc;
 		serial0 = &uart0;
@@ -136,12 +139,6 @@
 		reg = <0x0>;
 		#address-cells = <0x2>;
 		#size-cells = <0x1>;
-		nand-ecc-mode = "soft";
-		nand-ecc-algo = "bch";
-		nand-rb = <0>;
-		label = "main-storage-0";
-		nand-ecc-step-size = <1024>;
-		nand-ecc-strength = <24>;
 
 		partition@0 {	/* for testing purpose */
 			label = "nand-fsbl-uboot";
@@ -172,12 +169,6 @@
 		reg = <0x1>;
 		#address-cells = <0x2>;
 		#size-cells = <0x1>;
-		nand-ecc-mode = "soft";
-		nand-ecc-algo = "bch";
-		nand-rb = <0>;
-		label = "main-storage-1";
-		nand-ecc-step-size = <1024>;
-		nand-ecc-strength = <24>;
 
 		partition@0 {	/* for testing purpose */
 			label = "nand1-fsbl-uboot";
@@ -217,7 +208,7 @@
 		conf {
 			groups = "can0_9_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
 
 		conf-rx {
@@ -240,7 +231,7 @@
 		conf {
 			groups = "can1_8_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
 
 		conf-rx {
@@ -264,7 +255,7 @@
 			groups = "i2c0_1_grp";
 			bias-pull-up;
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
 	};
 
@@ -277,7 +268,7 @@
 		conf {
 			groups = "gpio0_6_grp", "gpio0_7_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
 	};
 
@@ -290,7 +281,7 @@
 		conf {
 			groups = "uart0_10_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
 
 		conf-rx {
@@ -313,7 +304,7 @@
 		conf {
 			groups = "uart1_10_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
 
 		conf-rx {
@@ -336,7 +327,7 @@
 		conf {
 			groups = "usb1_0_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
 
 		conf-rx {
@@ -360,7 +351,7 @@
 		conf {
 			groups = "ethernet2_0_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
 
 		conf-rx {
@@ -385,7 +376,7 @@
 		conf-mdio {
 			groups = "mdio2_0_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 			bias-disable;
 		};
 	};
@@ -442,7 +433,7 @@
 			groups = "spi0_0_grp";
 			bias-disable;
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
 
 		mux-cs {
@@ -468,7 +459,7 @@
 			groups = "spi1_3_grp";
 			bias-disable;
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
 
 		mux-cs {
@@ -503,7 +494,7 @@
 		reg = <0>;
 
 		partition@0 {
-			label = "spi0-data";
+			label = "data";
 			reg = <0x0 0x100000>;
 		};
 	};
@@ -523,7 +514,7 @@
 		reg = <0>;
 
 		partition@0 {
-			label = "spi1-data";
+			label = "data";
 			reg = <0x0 0x84000>;
 		};
 	};

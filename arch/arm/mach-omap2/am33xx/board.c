@@ -11,10 +11,7 @@
 #include <dm.h>
 #include <debug_uart.h>
 #include <errno.h>
-#include <init.h>
-#include <net.h>
 #include <ns16550.h>
-#include <omap3_spi.h>
 #include <spl.h>
 #include <asm/arch/cpu.h>
 #include <asm/arch/hardware.h>
@@ -33,7 +30,6 @@
 #include <i2c.h>
 #include <miiphy.h>
 #include <cpsw.h>
-#include <linux/delay.h>
 #include <linux/errno.h>
 #include <linux/compiler.h>
 #include <linux/usb/ch9.h>
@@ -41,20 +37,6 @@
 #include <linux/usb/musb.h>
 #include <asm/omap_musb.h>
 #include <asm/davinci_rtc.h>
-
-#define AM43XX_EMIF_BASE				0x4C000000
-#define AM43XX_SDRAM_CONFIG_OFFSET			0x8
-#define AM43XX_SDRAM_TYPE_MASK				0xE0000000
-#define AM43XX_SDRAM_TYPE_SHIFT				29
-#define AM43XX_SDRAM_TYPE_DDR3				3
-#define AM43XX_READ_WRITE_LEVELING_CTRL_OFFSET		0xDC
-#define AM43XX_RDWRLVLFULL_START			0x80000000
-
-/* SPI flash. */
-#if CONFIG_IS_ENABLED(DM_SPI) && !CONFIG_IS_ENABLED(OF_CONTROL)
-#define AM33XX_SPI0_BASE	0x48030000
-#define AM33XX_SPI0_OFFSET	(AM33XX_SPI0_BASE + OMAP4_MCSPI_REG_OFFSET)
-#endif
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -126,7 +108,7 @@ U_BOOT_DEVICES(am33xx_i2c) = {
 };
 #endif
 
-#if CONFIG_IS_ENABLED(DM_GPIO)
+#ifdef CONFIG_DM_GPIO
 static const struct omap_gpio_platdata am33xx_gpio[] = {
 	{ 0, AM33XX_GPIO0_BASE },
 	{ 1, AM33XX_GPIO1_BASE },
@@ -149,20 +131,9 @@ U_BOOT_DEVICES(am33xx_gpios) = {
 #endif
 };
 #endif
-#if CONFIG_IS_ENABLED(DM_SPI) && !CONFIG_IS_ENABLED(OF_CONTROL)
-static const struct omap3_spi_plat omap3_spi_pdata = {
-	.regs = (struct mcspi *)AM33XX_SPI0_OFFSET,
-	.pin_dir = MCSPI_PINDIR_D0_IN_D1_OUT,
-};
-
-U_BOOT_DEVICE(am33xx_spi) = {
-	.name = "omap3_spi",
-	.platdata = &omap3_spi_pdata,
-};
-#endif
 #endif
 
-#if !CONFIG_IS_ENABLED(DM_GPIO)
+#ifndef CONFIG_DM_GPIO
 static const struct gpio_bank gpio_bank_am33xx[] = {
 	{ (void *)AM33XX_GPIO0_BASE },
 	{ (void *)AM33XX_GPIO1_BASE },
@@ -178,7 +149,7 @@ const struct gpio_bank *const omap_gpio_bank = gpio_bank_am33xx;
 #endif
 
 #if defined(CONFIG_MMC_OMAP_HS)
-int cpu_mmc_init(struct bd_info *bis)
+int cpu_mmc_init(bd_t *bis)
 {
 	int ret;
 
@@ -396,8 +367,8 @@ void update_rtc_magic(void)
  */
 int board_early_init_f(void)
 {
-	set_mux_conf_regs();
 	prcm_init();
+	set_mux_conf_regs();
 #if defined(CONFIG_SPL_BUILD) && defined(CONFIG_SPL_RTC_DDR_SUPPORT)
 	update_rtc_magic();
 #endif
@@ -464,7 +435,7 @@ static void rtc_only(void)
 	struct prm_device_inst *prm_device =
 				(struct prm_device_inst *)PRM_DEVICE_INST;
 
-	u32 scratch1, sdrc;
+	u32 scratch1;
 	void (*resume_func)(void);
 
 	scratch1 = readl(&rtc->scratch1);
@@ -502,25 +473,8 @@ static void rtc_only(void)
 	rtc_only_prcm_init();
 	sdram_init();
 
-	/* Check EMIF4D_SDRAM_CONFIG[31:29] SDRAM_TYPE */
-	/* Only perform leveling if SDRAM_TYPE = 3 (DDR3) */
-	sdrc = readl(AM43XX_EMIF_BASE + AM43XX_SDRAM_CONFIG_OFFSET);
-
-	sdrc &= AM43XX_SDRAM_TYPE_MASK;
-	sdrc >>= AM43XX_SDRAM_TYPE_SHIFT;
-
-	if (sdrc == AM43XX_SDRAM_TYPE_DDR3) {
-		writel(AM43XX_RDWRLVLFULL_START,
-		       AM43XX_EMIF_BASE +
-		       AM43XX_READ_WRITE_LEVELING_CTRL_OFFSET);
-		mdelay(1);
-
-am43xx_wait:
-		sdrc = readl(AM43XX_EMIF_BASE +
-			     AM43XX_READ_WRITE_LEVELING_CTRL_OFFSET);
-		if (sdrc == AM43XX_RDWRLVLFULL_START)
-			goto am43xx_wait;
-	}
+	/* Disable EMIF_DEVOFF for normal operation and to exit self-refresh */
+	writel(0, &prm_device->emif_ctrl);
 
 	resume_func = (void *)readl(&rtc->scratch0);
 	if (resume_func)

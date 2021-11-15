@@ -11,8 +11,6 @@
  */
 
 #include <common.h>
-#include <command.h>
-#include <env.h>
 #include <fastboot.h>
 #include <net/fastboot.h>
 
@@ -88,7 +86,7 @@ void fastboot_okay(const char *reason, char *response)
  * which sets whatever flag your board specific Android bootloader flow
  * requires in order to re-enter the bootloader.
  */
-int __weak fastboot_set_reboot_flag(enum fastboot_reboot_reason reason)
+int __weak fastboot_set_reboot_flag(void)
 {
 	return -ENOSYS;
 }
@@ -121,7 +119,7 @@ void fastboot_boot(void)
 	if (s) {
 		run_command(s, CMD_FLAG_ENV);
 	} else {
-		static char boot_addr_start[20];
+		static char boot_addr_start[12];
 		static char *const bootm_args[] = {
 			"bootm", boot_addr_start, NULL
 		};

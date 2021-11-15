@@ -8,9 +8,7 @@
 #include <errno.h>
 #include <i2c.h>
 #include <edid.h>
-#include <log.h>
 #include <video_bridge.h>
-#include <linux/delay.h>
 #include "../anx98xx-edp.h"
 
 #define DP_MAX_LINK_RATE		0x001

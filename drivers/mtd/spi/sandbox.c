@@ -12,7 +12,6 @@
 
 #include <common.h>
 #include <dm.h>
-#include <log.h>
 #include <malloc.h>
 #include <spi.h>
 #include <os.h>
@@ -44,6 +43,7 @@ enum sandbox_sf_state {
 	SF_WRITE_STATUS, /* write the flash's status register */
 };
 
+#if CONFIG_IS_ENABLED(LOG)
 static const char *sandbox_sf_state_name(enum sandbox_sf_state state)
 {
 	static const char * const states[] = {
@@ -52,6 +52,7 @@ static const char *sandbox_sf_state_name(enum sandbox_sf_state state)
 	};
 	return states[state];
 }
+#endif /* LOG */
 
 /* Bits for the status register */
 #define STAT_WIP	(1 << 0)
@@ -91,7 +92,7 @@ struct sandbox_spi_flash {
 	/* The current flash status (see STAT_XXX defines above) */
 	u16 status;
 	/* Data describing the flash we're emulating */
-	const struct flash_info *data;
+	const struct spi_flash_info *data;
 	/* The file on disk to serv up data from */
 	int fd;
 };
@@ -121,7 +122,7 @@ static int sandbox_sf_probe(struct udevice *dev)
 	/* spec = idcode:file */
 	struct sandbox_spi_flash *sbsf = dev_get_priv(dev);
 	size_t len, idname_len;
-	const struct flash_info *data;
+	const struct spi_flash_info *data;
 	struct sandbox_spi_flash_plat_data *pdata = dev_get_platdata(dev);
 	struct sandbox_state *state = state_get_current();
 	struct dm_spi_slave_platdata *slave_plat;
@@ -154,7 +155,7 @@ static int sandbox_sf_probe(struct udevice *dev)
 	idname_len = strlen(spec);
 	debug("%s: device='%s'\n", __func__, spec);
 
-	for (data = spi_nor_ids; data->name; data++) {
+	for (data = spi_flash_ids; data->name; data++) {
 		len = strlen(data->name);
 		if (idname_len != len)
 			continue;
@@ -242,43 +243,43 @@ static int sandbox_sf_process_cmd(struct sandbox_spi_flash *sbsf, const u8 *rx,
 
 	sbsf->cmd = rx[0];
 	switch (sbsf->cmd) {
-	case SPINOR_OP_RDID:
+	case CMD_READ_ID:
 		sbsf->state = SF_ID;
 		sbsf->cmd = SF_ID;
 		break;
-	case SPINOR_OP_READ_FAST:
+	case CMD_READ_ARRAY_FAST:
 		sbsf->pad_addr_bytes = 1;
-	case SPINOR_OP_READ:
-	case SPINOR_OP_PP:
+	case CMD_READ_ARRAY_SLOW:
+	case CMD_PAGE_PROGRAM:
 		sbsf->state = SF_ADDR;
 		break;
-	case SPINOR_OP_WRDI:
+	case CMD_WRITE_DISABLE:
 		debug(" write disabled\n");
 		sbsf->status &= ~STAT_WEL;
 		break;
-	case SPINOR_OP_RDSR:
+	case CMD_READ_STATUS:
 		sbsf->state = SF_READ_STATUS;
 		break;
-	case SPINOR_OP_RDSR2:
+	case CMD_READ_STATUS1:
 		sbsf->state = SF_READ_STATUS1;
 		break;
-	case SPINOR_OP_WREN:
+	case CMD_WRITE_ENABLE:
 		debug(" write enabled\n");
 		sbsf->status |= STAT_WEL;
 		break;
-	case SPINOR_OP_WRSR:
+	case CMD_WRITE_STATUS:
 		sbsf->state = SF_WRITE_STATUS;
 		break;
 	default: {
 		int flags = sbsf->data->flags;
 
 		/* we only support erase here */
-		if (sbsf->cmd == SPINOR_OP_CHIP_ERASE) {
+		if (sbsf->cmd == CMD_ERASE_CHIP) {
 			sbsf->erase_size = sbsf->data->sector_size *
 				sbsf->data->n_sectors;
-		} else if (sbsf->cmd == SPINOR_OP_BE_4K && (flags & SECT_4K)) {
+		} else if (sbsf->cmd == CMD_ERASE_4K && (flags & SECT_4K)) {
 			sbsf->erase_size = 4 << 10;
-		} else if (sbsf->cmd == SPINOR_OP_SE && !(flags & SECT_4K)) {
+		} else if (sbsf->cmd == CMD_ERASE_64K && !(flags & SECT_4K)) {
 			sbsf->erase_size = 64 << 10;
 		} else {
 			debug(" cmd unknown: %#x\n", sbsf->cmd);
@@ -379,11 +380,11 @@ static int sandbox_sf_xfer(struct udevice *dev, unsigned int bitlen,
 				return -EIO;
 			}
 			switch (sbsf->cmd) {
-			case SPINOR_OP_READ_FAST:
-			case SPINOR_OP_READ:
+			case CMD_READ_ARRAY_FAST:
+			case CMD_READ_ARRAY_SLOW:
 				sbsf->state = SF_READ;
 				break;
-			case SPINOR_OP_PP:
+			case CMD_PAGE_PROGRAM:
 				sbsf->state = SF_WRITE;
 				break;
 			default:

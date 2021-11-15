@@ -11,7 +11,6 @@
  */
 
 #include <common.h>
-#include <hang.h>
 #include <nand.h>
 #include <asm/arch/imx-regs.h>
 #include <asm/io.h>

@@ -10,9 +10,7 @@
 #include <common.h>
 #include <dm.h>
 #include <errno.h>
-#include <log.h>
 #include <pwm.h>
-#include <dm/device_compat.h>
 #include <power/regulator.h>
 
 DECLARE_GLOBAL_DATA_PTR;

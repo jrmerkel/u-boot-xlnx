@@ -7,10 +7,7 @@
 #include <dm.h>
 #include <errno.h>
 #include <hwspinlock.h>
-#include <log.h>
 #include <dm/device-internal.h>
-#include <dm/device_compat.h>
-#include <linux/compat.h>
 
 static inline const struct hwspinlock_ops *
 hwspinlock_dev_ops(struct udevice *dev)

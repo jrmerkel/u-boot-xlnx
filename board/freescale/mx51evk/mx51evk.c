@@ -4,12 +4,10 @@
  */
 
 #include <common.h>
-#include <init.h>
 #include <asm/io.h>
 #include <asm/gpio.h>
 #include <asm/arch/imx-regs.h>
 #include <asm/arch/iomux-mx51.h>
-#include <linux/delay.h>
 #include <linux/errno.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/arch/crm_regs.h>
@@ -18,7 +16,7 @@
 #include <i2c.h>
 #include <input.h>
 #include <mmc.h>
-#include <fsl_esdhc_imx.h>
+#include <fsl_esdhc.h>
 #include <power/pmic.h>
 #include <fsl_pmic.h>
 #include <mc13892.h>
@@ -26,7 +24,7 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#ifdef CONFIG_FSL_ESDHC_IMX
+#ifdef CONFIG_FSL_ESDHC
 struct fsl_esdhc_cfg esdhc_cfg[2] = {
 	{MMC_SDHC1_BASE_ADDR},
 	{MMC_SDHC2_BASE_ADDR},
@@ -264,7 +262,7 @@ static void power_init(void)
 	gpio_set_value(IMX_GPIO_NR(2, 14), 1);
 }
 
-#ifdef CONFIG_FSL_ESDHC_IMX
+#ifdef CONFIG_FSL_ESDHC
 int board_mmc_getcd(struct mmc *mmc)
 {
 	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
@@ -285,7 +283,7 @@ int board_mmc_getcd(struct mmc *mmc)
 	return ret;
 }
 
-int board_mmc_init(struct bd_info *bis)
+int board_mmc_init(bd_t *bis)
 {
 	static const iomux_v3_cfg_t sd1_pads[] = {
 		NEW_PAD_CTRL(MX51_PAD_SD1_CMD__SD1_CMD, PAD_CTL_DSE_MAX |

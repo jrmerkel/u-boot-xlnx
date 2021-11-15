@@ -8,7 +8,6 @@
  */
 
 #include <common.h>
-#include <log.h>
 #include <spi.h>
 #include <clk.h>
 #include <dm.h>
@@ -16,7 +15,6 @@
 #include <errno.h>
 #include <asm/io.h>
 #include <linux/bitfield.h>
-#include <linux/bitops.h>
 
 /* register map */
 #define REG_CMD			0x00

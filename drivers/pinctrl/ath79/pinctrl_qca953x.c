@@ -6,7 +6,6 @@
 #include <common.h>
 #include <dm.h>
 #include <errno.h>
-#include <log.h>
 #include <asm/io.h>
 #include <dm/pinctrl.h>
 #include <mach/ar71xx_regs.h>
@@ -131,7 +130,7 @@ static int qca953x_pinctrl_probe(struct udevice *dev)
 	struct qca953x_pinctrl_priv *priv = dev_get_priv(dev);
 	fdt_addr_t addr;
 
-	addr = dev_read_addr(dev);
+	addr = devfdt_get_addr(dev);
 	if (addr == FDT_ADDR_T_NONE)
 		return -EINVAL;
 

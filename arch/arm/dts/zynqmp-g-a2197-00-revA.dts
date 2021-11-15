@@ -14,14 +14,14 @@
 
 / {
 	model = "Versal System Controller on a2197 MGT Char board RevA";
-	compatible = "xlnx,zynqmp-g-a2197-00-revA", "xlnx,zynqmp-a2197-revA",
+	compatible = "xlnx,zynqmp-a2197-g-revA", "xlnx,zynqmp-a2197-revA",
 		     "xlnx,zynqmp-a2197", "xlnx,zynqmp";
 
 	aliases {
 		ethernet0 = &gem0;
+		gpio0 = &gpio;
 		i2c0 = &i2c0;
 		mmc0 = &sdhci0;
-		nvmem0 = &eeprom;
 		rtc0 = &rtc;
 		serial0 = &uart0;
 		serial1 = &dcc;
@@ -31,36 +31,12 @@
 	chosen {
 		bootargs = "earlycon";
 		stdout-path = "serial0:115200n8";
+		xlnx,eeprom = <&eeprom>;
 	};
 
 	memory@0 {
 		device_type = "memory";
 		reg = <0x0 0x0 0x0 0x80000000>;
-	};
-
-	ina226-u74 {
-		compatible = "iio-hwmon";
-		io-channels = <&u74 0>, <&u74 1>, <&u74 2>, <&u74 3>;
-	};
-	ina226-u75 {
-		compatible = "iio-hwmon";
-		io-channels = <&u75 0>, <&u75 1>, <&u75 2>, <&u75 3>;
-	};
-	ina226-u78 {
-		compatible = "iio-hwmon";
-		io-channels = <&u78 0>, <&u78 1>, <&u78 2>, <&u78 3>;
-	};
-	ina226-u79 {
-		compatible = "iio-hwmon";
-		io-channels = <&u79 0>, <&u79 1>, <&u79 2>, <&u79 3>;
-	};
-	ina226-u82 {
-		compatible = "iio-hwmon";
-		io-channels = <&u82 0>, <&u82 1>, <&u82 2>, <&u82 3>;
-	};
-	ina226-u84 {
-		compatible = "iio-hwmon";
-		io-channels = <&u84 0>, <&u84 1>, <&u84 2>, <&u84 3>;
 	};
 };
 
@@ -69,11 +45,12 @@
 	non-removable;
 	disable-wp;
 	bus-width = <8>;
-	xlnx,mio-bank = <0>;
+	xlnx,mio_bank = <0>;
 };
 
 &uart0 { /* uart0 MIO38-39 */
 	status = "okay";
+	u-boot,dm-pre-reloc;
 };
 
 &gem0 { /* eth MDIO 76/77 */
@@ -86,6 +63,9 @@
 		reset-gpios = <&gpio 42 GPIO_ACTIVE_LOW>;
 /*		xlnx,phy-type = <PHY_TYPE_SGMII>; */
 	};
+/*	phy-names = "...";
+	phys = <&lane0 PHY_TYPE_SGMII ... >
+	Note: lane0 sgmii/lane1 usb3 */
 };
 
 &gpio {
@@ -218,45 +198,33 @@
 				compatible = "ti,tps544b25";
 				reg = <0x20>;
 			};
-			u74: ina226@40 { /* u74 */
+			ina226@40 { /* u74 */
 				compatible = "ti,ina226";
-				#io-channel-cells = <1>;
-				label = "ina226-u74";
 				reg = <0x40>;
 				shunt-resistor = <1000>;
 			};
-			u75: ina226@41 { /* u75 */
+			ina226@41 { /* u75 */
 				compatible = "ti,ina226";
-				#io-channel-cells = <1>;
-				label = "ina226-u75";
 				reg = <0x41>;
 				shunt-resistor = <1000>;
 			};
-			u78: ina226@42 { /* u78 */
+			ina226@42 { /* u78 */
 				compatible = "ti,ina226";
-				#io-channel-cells = <1>;
-				label = "ina226-u78";
 				reg = <0x42>;
 				shunt-resistor = <5000>;
 			};
-			u79: ina226@43 { /* u79 */
+			ina226@43 { /* u79 */
 				compatible = "ti,ina226";
-				#io-channel-cells = <1>;
-				label = "ina226-u79";
 				reg = <0x43>;
 				shunt-resistor = <1000>;
 			};
-			u82: ina226@44 { /* u82 */
+			ina226@44 { /* u82 */
 				compatible = "ti,ina226";
-				#io-channel-cells = <1>;
-				label = "ina226-u82";
 				reg = <0x44>;
 				shunt-resistor = <1000>;
 			};
-			u84: ina226@45 { /* u84 */
+			ina226@45 { /* u84 */
 				compatible = "ti,ina226";
-				#io-channel-cells = <1>;
-				label = "ina226-u84";
 				reg = <0x45>;
 				shunt-resistor = <5000>;
 			};

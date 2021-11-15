@@ -5,9 +5,10 @@
 # Entry-type module for U-Boot device tree with the microcode removed
 #
 
-from binman.entry import Entry
-from binman.etype.blob_dtb import Entry_blob_dtb
-from patman import tools
+from entry import Entry
+from blob_dtb import Entry_blob_dtb
+import state
+import tools
 
 class Entry_u_boot_dtb_with_ucode(Entry_blob_dtb):
     """A U-Boot device tree file, with the microcode removed
@@ -24,12 +25,8 @@ class Entry_u_boot_dtb_with_ucode(Entry_blob_dtb):
     it available to u_boot_ucode.
     """
     def __init__(self, section, etype, node):
-        # Put this here to allow entry-docs and help to work without libfdt
-        global state
-        from binman import state
-
-        super().__init__(section, etype, node)
-        self.ucode_data = b''
+        Entry_blob_dtb.__init__(self, section, etype, node)
+        self.ucode_data = ''
         self.collate = False
         self.ucode_offset = None
         self.ucode_size = None
@@ -39,12 +36,9 @@ class Entry_u_boot_dtb_with_ucode(Entry_blob_dtb):
     def GetDefaultFilename(self):
         return 'u-boot.dtb'
 
-    def GetFdtEtype(self):
-        return 'u-boot-dtb'
-
     def ProcessFdt(self, fdt):
         # So the module can be loaded without it
-        from dtoc import fdt
+        import fdt
 
         # If the section does not need microcode, there is nothing to do
         ucode_dest_entry = self.section.FindEntryType(
@@ -59,11 +53,11 @@ class Entry_u_boot_dtb_with_ucode(Entry_blob_dtb):
             return True
 
         # Remove the microcode
-        etype = self.GetFdtEtype()
-        fdt = state.GetFdtForEtype(etype)
+        fname = self.GetDefaultFilename()
+        fdt = state.GetFdt(fname)
         self.ucode = fdt.GetNode('/microcode')
         if not self.ucode:
-            raise self.Raise("No /microcode node found in '%s'" % etype)
+            raise self.Raise("No /microcode node found in '%s'" % fname)
 
         # There's no need to collate it (move all microcode into one place)
         # if we only have one chunk of microcode.
@@ -71,14 +65,14 @@ class Entry_u_boot_dtb_with_ucode(Entry_blob_dtb):
         for node in self.ucode.subnodes:
             data_prop = node.props.get('data')
             if data_prop:
-                self.ucode_data += data_prop.bytes
+                self.ucode_data += ''.join(data_prop.bytes)
                 if self.collate:
                     node.DeleteProp('data')
         return True
 
     def ObtainContents(self):
         # Call the base class just in case it does something important.
-        super().ObtainContents()
+        Entry_blob_dtb.ObtainContents(self)
         if self.ucode and not self.collate:
             for node in self.ucode.subnodes:
                 data_prop = node.props.get('data')

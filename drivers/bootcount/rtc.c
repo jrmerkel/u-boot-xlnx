@@ -6,7 +6,6 @@
 #include <common.h>
 #include <bootcount.h>
 #include <dm.h>
-#include <log.h>
 #include <rtc.h>
 
 static const u8 bootcount_magic = 0xbc;

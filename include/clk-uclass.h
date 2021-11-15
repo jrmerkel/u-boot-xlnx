@@ -53,14 +53,14 @@ struct clk_ops {
 	 */
 	int (*request)(struct clk *clock);
 	/**
-	 * rfree - Free a previously requested clock.
+	 * free - Free a previously requested clock.
 	 *
 	 * This is the implementation of the client clk_free() API.
 	 *
 	 * @clock:	The clock to free.
 	 * @return 0 if OK, or a negative error code.
 	 */
-	int (*rfree)(struct clk *clock);
+	int (*free)(struct clk *clock);
 	/**
 	 * get_rate() - Get current clock rate.
 	 *

@@ -10,14 +10,12 @@
 
 #include <common.h>
 #include <errno.h>
-#include <log.h>
 #include <malloc.h>
 #include <dm/device.h>
 #include <dm/device-internal.h>
 #include <dm/uclass.h>
 #include <dm/uclass-internal.h>
 #include <dm/util.h>
-#include <power-domain.h>
 
 int device_chld_unbind(struct udevice *dev, struct driver *drv)
 {
@@ -31,14 +29,11 @@ int device_chld_unbind(struct udevice *dev, struct driver *drv)
 			continue;
 
 		ret = device_unbind(pos);
-		if (ret && !saved_ret) {
-			log_warning("device '%s' failed to unbind\n",
-				    pos->name);
+		if (ret && !saved_ret)
 			saved_ret = ret;
-		}
 	}
 
-	return log_ret(saved_ret);
+	return saved_ret;
 }
 
 int device_chld_remove(struct udevice *dev, struct driver *drv,
@@ -67,13 +62,13 @@ int device_unbind(struct udevice *dev)
 	int ret;
 
 	if (!dev)
-		return log_msg_ret("dev", -EINVAL);
+		return -EINVAL;
 
 	if (dev->flags & DM_FLAG_ACTIVATED)
-		return log_msg_ret("active", -EINVAL);
+		return -EINVAL;
 
 	if (!(dev->flags & DM_FLAG_BOUND))
-		return log_msg_ret("not-bound", -EINVAL);
+		return -EINVAL;
 
 	drv = dev->driver;
 	assert(drv);
@@ -81,12 +76,12 @@ int device_unbind(struct udevice *dev)
 	if (drv->unbind) {
 		ret = drv->unbind(dev);
 		if (ret)
-			return log_msg_ret("unbind", ret);
+			return ret;
 	}
 
 	ret = device_chld_unbind(dev, NULL);
 	if (ret)
-		return log_msg_ret("child unbind", ret);
+		return ret;
 
 	if (dev->flags & DM_FLAG_ALLOC_PDATA) {
 		free(dev->platdata);
@@ -102,7 +97,7 @@ int device_unbind(struct udevice *dev)
 	}
 	ret = uclass_unbind_device(dev);
 	if (ret)
-		return log_msg_ret("uc", ret);
+		return ret;
 
 	if (dev->parent)
 		list_del(&dev->sibling_node);
@@ -144,7 +139,6 @@ void device_free(struct udevice *dev)
 			dev->parent_priv = NULL;
 		}
 	}
-	dev->flags &= ~DM_FLAG_PLATDATA_VALID;
 
 	devres_release_probe(dev);
 }
@@ -152,7 +146,7 @@ void device_free(struct udevice *dev)
 static bool flags_remove(uint flags, uint drv_flags)
 {
 	if ((flags & DM_REMOVE_NORMAL) ||
-	    (flags && (drv_flags & (DM_FLAG_ACTIVE_DMA | DM_FLAG_OS_PREPARE))))
+	    (flags & (drv_flags & (DM_FLAG_ACTIVE_DMA | DM_FLAG_OS_PREPARE))))
 		return true;
 
 	return false;
@@ -197,12 +191,6 @@ int device_remove(struct udevice *dev, uint flags)
 				__func__, dev->name);
 		}
 	}
-
-	if (!(flags & DM_REMOVE_NO_PD) &&
-	    !(drv->flags &
-	      (DM_FLAG_DEFAULT_PD_CTRL_OFF | DM_FLAG_REMOVE_WITH_PD_ON)) &&
-	    dev != gd->cur_serial_dev)
-		dev_power_domain_off(dev);
 
 	if (flags_remove(flags, drv->flags)) {
 		device_free(dev);

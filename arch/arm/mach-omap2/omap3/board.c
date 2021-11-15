@@ -16,9 +16,7 @@
  *
  */
 #include <common.h>
-#include <command.h>
 #include <dm.h>
-#include <init.h>
 #include <spl.h>
 #include <asm/io.h>
 #include <asm/arch/sys_proto.h>
@@ -35,9 +33,7 @@ extern omap3_sysinfo sysinfo;
 static void omap3_invalidate_l2_cache_secure(void);
 #endif
 
-#if CONFIG_IS_ENABLED(DM_GPIO)
-#if !CONFIG_IS_ENABLED(OF_CONTROL)
-/* Manually initialize GPIO banks when OF_CONTROL doesn't */
+#ifdef CONFIG_DM_GPIO
 static const struct omap_gpio_platdata omap34xx_gpio[] = {
 	{ 0, OMAP34XX_GPIO1_BASE },
 	{ 1, OMAP34XX_GPIO2_BASE },
@@ -55,7 +51,7 @@ U_BOOT_DEVICES(omap34xx_gpios) = {
 	{ "gpio_omap", &omap34xx_gpio[4] },
 	{ "gpio_omap", &omap34xx_gpio[5] },
 };
-#endif
+
 #else
 
 static const struct gpio_bank gpio_bank_34xx[6] = {
@@ -281,8 +277,7 @@ void abort(void)
 /******************************************************************************
  * OMAP3 specific command to switch between NAND HW and SW ecc
  *****************************************************************************/
-static int do_switch_ecc(struct cmd_tbl *cmdtp, int flag, int argc,
-			 char *const argv[])
+static int do_switch_ecc(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
 {
 	int hw, strength = 1;
 

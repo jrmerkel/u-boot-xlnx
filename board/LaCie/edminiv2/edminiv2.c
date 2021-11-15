@@ -9,7 +9,6 @@
 
 #include <common.h>
 #include <miiphy.h>
-#include <net.h>
 #include <asm/arch/orion5x.h>
 #include "../common/common.h"
 #include <spl.h>

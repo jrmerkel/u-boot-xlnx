@@ -10,12 +10,6 @@
 #include "versal-vc-p-a2197-00-revA.dts"
 
 / {
-	compatible = "xlnx,versal-vc-p-a2197-00-revA-x-prc-04-revA",
-		     "xlnx,versal-vc-p-a2197-00-revA",
-		     "xlnx,versal-vc-p-a2197-00",
-		     "xlnx,versal-vc-p-a2197", "xlnx,versal";
-	model = "Xilinx Versal A2197 Processor board revA - x-prc-04 revA";
-
 	chosen {
 		bootargs = "console=ttyAMA0 earlycon=pl011,mmio32,0xFF000000,115200n8 clk_ignore_unused";
 		stdout-path = "serial0:115200";
@@ -72,7 +66,7 @@
 &qspi {
 	status = "okay"; /* u93 and u92 and u161 and u160 */
 	num-cs = <1>;
-	is-dual = <0>;
+	is-dual = <1>;
 	is-stacked = <1>;
 	spi-rx-bus-width = <4>;
 	spi-tx-bus-width = <4>;
@@ -80,7 +74,7 @@
 	flash@0 {
 		#address-cells = <1>;
 		#size-cells = <1>;
-		compatible = "m25p80", "jedec,spi-nor"; /* 512MB */
+		compatible = "m25p80", "spi-flash"; /* 512MB */
 		reg = <0>;
 		spi-tx-bus-width = <4>;
 		spi-rx-bus-width = <4>;
@@ -95,7 +89,7 @@
 &sdhci1 { /* J3 MIO26, MIO29 - MIO33 */
 	status = "okay";
 	disable-wp;
-	xlnx,mio-bank = <1>; /* FIXME */
+	xlnx,mio_bank = <1>; /* FIXME */
 };
 
 &serial0 { /* MIO35 - MIO37 */
@@ -113,7 +107,7 @@
 	flash@0 { /* U171 - IS25LP016B - 16Mb */
 		#address-cells = <1>;
 		#size-cells = <1>;
-		compatible = "issi,is25lp016b", "m25p80", "jedec,spi-nor";
+		compatible = "issi,is25lp016b", "m25p80", "spi-flash";
 		spi-max-frequency = <104000000>;
 		reg = <0>;
 

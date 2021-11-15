@@ -18,8 +18,6 @@
 
 #define CONFIG_REMAKE_ELF
 
-#define CONFIG_SYS_BOOTM_LEN		SZ_64M
-
 /* Physical Memory Map */
 
 /* CONFIG_SYS_TEXT_BASE needs to align with where ATF loads bl33.bin */
@@ -55,6 +53,11 @@
 
 #define CONFIG_HIKEY_GPIO
 
+/* SD/MMC configuration */
+#define CONFIG_BOUNCE_BUFFER
+
+/* Command line configuration */
+
 /* BOOTP options */
 #define CONFIG_BOOTP_BOOTFILESIZE
 
@@ -79,7 +82,8 @@
 				"initrd_high=0xffffffffffffffff\0" \
 				BOOTENV
 
-/* Preserve environment on eMMC */
+/* Preserve environment on sd card */
+#define CONFIG_ENV_SIZE			0x1000
 
 /* Monitor Command Prompt */
 #define CONFIG_SYS_CBSIZE		512	/* Console I/O Buffer Size */

@@ -6,8 +6,7 @@
 
 #include <common.h>
 #include <dm.h>
-#include <init.h>
-#include <net.h>
+#include <environment.h>
 #include <asm/io.h>
 #include <asm/arch/axg.h>
 #include <asm/arch/sm.h>
@@ -17,8 +16,6 @@
 int misc_init_r(void)
 {
 	meson_eth_init(PHY_INTERFACE_MODE_RGMII, 0);
-
-	meson_generate_serial_ethaddr();
 
 	return 0;
 }

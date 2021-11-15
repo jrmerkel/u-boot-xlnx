@@ -30,6 +30,10 @@
  */
 #define CONFIG_BOOTP_BOOTFILESIZE
 
+/*
+ * Command line configuration.
+ */
+
 #define CONFIG_DRIVER_NE2000
 #define CONFIG_DRIVER_NE2000_BASE	0xffffffffb4000300
 
@@ -69,6 +73,9 @@
 /* default load address */
 #define CONFIG_SYS_LOAD_ADDR		0xffffffff81000000
 
+#define CONFIG_SYS_MEMTEST_START	0xffffffff80100000
+#define CONFIG_SYS_MEMTEST_END		0xffffffff80800000
+
 /*-----------------------------------------------------------------------
  * FLASH and environment organization
  */
@@ -83,6 +90,10 @@
 #define CONFIG_SYS_MAX_FLASH_SECT	128
 
 /* Address and size of Primary Environment Sector */
+#define CONFIG_ENV_SIZE		0x8000
+#define CONFIG_ENV_ADDR		(CONFIG_SYS_FLASH_BASE + (4 << 20) - CONFIG_ENV_SIZE)
+
+#define CONFIG_ENV_OVERWRITE	1
 
 #define MEM_SIZE		128
 

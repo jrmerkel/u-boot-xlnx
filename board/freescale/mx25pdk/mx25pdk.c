@@ -6,16 +6,14 @@
  */
 
 #include <common.h>
-#include <init.h>
 #include <asm/io.h>
 #include <asm/gpio.h>
 #include <asm/arch/imx-regs.h>
 #include <asm/arch/iomux-mx25.h>
 #include <asm/arch/clock.h>
 #include <mmc.h>
-#include <fsl_esdhc_imx.h>
+#include <fsl_esdhc.h>
 #include <i2c.h>
-#include <linux/delay.h>
 #include <power/pmic.h>
 #include <fsl_pmic.h>
 #include <mc34704.h>
@@ -26,7 +24,7 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#ifdef CONFIG_FSL_ESDHC_IMX
+#ifdef CONFIG_FSL_ESDHC
 struct fsl_esdhc_cfg esdhc_cfg[1] = {
 	{IMX_MMC_SDHC1_BASE},
 };
@@ -153,7 +151,7 @@ int board_late_init(void)
 	return 0;
 }
 
-#ifdef CONFIG_FSL_ESDHC_IMX
+#ifdef CONFIG_FSL_ESDHC
 int board_mmc_getcd(struct mmc *mmc)
 {
 	/* Set up the Card Detect pin. */
@@ -163,7 +161,7 @@ int board_mmc_getcd(struct mmc *mmc)
 	return !gpio_get_value(CARD_DETECT);
 }
 
-int board_mmc_init(struct bd_info *bis)
+int board_mmc_init(bd_t *bis)
 {
 	static const iomux_v3_cfg_t sdhc1_pads[] = {
 		NEW_PAD_CTRL(MX25_PAD_SD1_CMD__SD1_CMD, NO_PAD_CTRL),

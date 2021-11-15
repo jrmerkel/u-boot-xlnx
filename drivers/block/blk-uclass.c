@@ -7,13 +7,9 @@
 #include <common.h>
 #include <blk.h>
 #include <dm.h>
-#include <log.h>
-#include <malloc.h>
-#include <part.h>
 #include <dm/device-internal.h>
 #include <dm/lists.h>
 #include <dm/uclass-internal.h>
-#include <linux/err.h>
 
 static const char *if_typename_str[IF_TYPE_COUNT] = {
 	[IF_TYPE_IDE]		= "ide",
@@ -28,7 +24,6 @@ static const char *if_typename_str[IF_TYPE_COUNT] = {
 	[IF_TYPE_NVME]		= "nvme",
 	[IF_TYPE_EFI]		= "efi",
 	[IF_TYPE_VIRTIO]	= "virtio",
-	[IF_TYPE_PVBLOCK]	= "pvblock",
 };
 
 static enum uclass_id if_type_uclass_id[IF_TYPE_COUNT] = {
@@ -44,7 +39,6 @@ static enum uclass_id if_type_uclass_id[IF_TYPE_COUNT] = {
 	[IF_TYPE_NVME]		= UCLASS_NVME,
 	[IF_TYPE_EFI]		= UCLASS_EFI,
 	[IF_TYPE_VIRTIO]	= UCLASS_VIRTIO,
-	[IF_TYPE_PVBLOCK]	= UCLASS_PVBLOCK,
 };
 
 static enum if_type if_typename_to_iftype(const char *if_typename)
@@ -148,9 +142,9 @@ struct blk_desc *blk_get_devnum_by_typename(const char *if_typename, int devnum)
  */
 struct blk_desc *blk_get_by_device(struct udevice *dev)
 {
-	struct udevice *child_dev;
+	struct udevice *child_dev, *next;
 
-	device_foreach_child(child_dev, dev) {
+	device_foreach_child_safe(child_dev, next, dev) {
 		if (device_get_uclass_id(child_dev) != UCLASS_BLK)
 			continue;
 
@@ -586,7 +580,6 @@ int blk_create_device(struct udevice *parent, const char *drv_name,
 	desc = dev_get_uclass_platdata(dev);
 	desc->if_type = if_type;
 	desc->blksz = blksz;
-	desc->log2blksz = LOG2(desc->blksz);
 	desc->lba = lba;
 	desc->part_type = PART_TYPE_UNKNOWN;
 	desc->bdev = dev;
@@ -646,12 +639,11 @@ int blk_unbind_all(int if_type)
 
 static int blk_post_probe(struct udevice *dev)
 {
-	if (IS_ENABLED(CONFIG_PARTITIONS) &&
-	    IS_ENABLED(CONFIG_HAVE_BLOCK_DEVICE)) {
-		struct blk_desc *desc = dev_get_uclass_platdata(dev);
+#if defined(CONFIG_PARTITIONS) && defined(CONFIG_HAVE_BLOCK_DEVICE)
+	struct blk_desc *desc = dev_get_uclass_platdata(dev);
 
-		part_init(desc);
-	}
+	part_init(desc);
+#endif
 
 	return 0;
 }

@@ -8,8 +8,6 @@
 #include <common.h>
 #include <dm.h>
 #include <errno.h>
-#include <log.h>
-#include <time.h>
 #include <asm/io.h>
 #include <asm/gpio.h>
 #include <asm/arch/clock.h>
@@ -17,8 +15,6 @@
 #include <asm/arch-tegra/clk_rst.h>
 #include <spi.h>
 #include <fdtdec.h>
-#include <linux/bitops.h>
-#include <linux/delay.h>
 #include "tegra_spi.h"
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -82,7 +78,7 @@ int tegra20_sflash_cs_info(struct udevice *bus, unsigned int cs,
 {
 	/* Tegra20 SPI-Flash - only 1 device ('bus/cs') */
 	if (cs != 0)
-		return -EINVAL;
+		return -ENODEV;
 	else
 		return 0;
 }
@@ -93,7 +89,7 @@ static int tegra20_sflash_ofdata_to_platdata(struct udevice *bus)
 	const void *blob = gd->fdt_blob;
 	int node = dev_of_offset(bus);
 
-	plat->base = dev_read_addr(bus);
+	plat->base = devfdt_get_addr(bus);
 	plat->periph_id = clock_decode_periph_id(bus);
 
 	if (plat->periph_id == PERIPH_ID_NONE) {

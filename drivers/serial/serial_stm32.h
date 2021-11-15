@@ -7,7 +7,6 @@
 #ifndef _SERIAL_STM32_
 #define _SERIAL_STM32_
 
-#include <linux/bitops.h>
 #define CR1_OFFSET(x)	(x ? 0x0c : 0x00)
 #define CR3_OFFSET(x)	(x ? 0x14 : 0x08)
 #define BRR_OFFSET(x)	(x ? 0x08 : 0x0c)
@@ -68,7 +67,6 @@ struct stm32x7_serial_platdata {
 #define USART_ISR_TXE			BIT(7)
 #define USART_ISR_RXNE			BIT(5)
 #define USART_ISR_ORE			BIT(3)
-#define USART_ISR_FE			BIT(1)
 #define USART_ISR_PE			BIT(0)
 
 #define USART_BRR_F_MASK		GENMASK(7, 0)
@@ -76,7 +74,6 @@ struct stm32x7_serial_platdata {
 #define USART_BRR_M_MASK		GENMASK(15, 4)
 
 #define USART_ICR_ORECF			BIT(3)
-#define USART_ICR_FECF			BIT(1)
 #define USART_ICR_PCECF			BIT(0)
 
 #endif

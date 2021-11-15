@@ -7,10 +7,7 @@
 #ifndef _DW_ETH_H
 #define _DW_ETH_H
 
-#include <asm/cache.h>
-#include <net.h>
-
-#if CONFIG_IS_ENABLED(DM_GPIO)
+#ifdef CONFIG_DM_GPIO
 #include <asm-generic/gpio.h>
 #endif
 
@@ -238,7 +235,7 @@ struct dw_eth_dev {
 #ifndef CONFIG_DM_ETH
 	struct eth_device *dev;
 #endif
-#if CONFIG_IS_ENABLED(DM_GPIO)
+#ifdef CONFIG_DM_GPIO
 	struct gpio_desc reset_gpio;
 #endif
 #ifdef CONFIG_CLK

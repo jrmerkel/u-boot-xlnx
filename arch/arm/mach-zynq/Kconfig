@@ -3,7 +3,7 @@ if ARCH_ZYNQ
 config SPL_LDSCRIPT
 	default "arch/arm/mach-zynq/u-boot-spl.lds"
 
-config SPL_FS_FAT
+config SPL_FAT_SUPPORT
 	default y
 
 config SPL_LIBCOMMON_SUPPORT
@@ -67,10 +67,21 @@ config BOOT_INIT_FILE
 	  Add register writes to boot.bin format (max 256 pairs).
 	  Expect a table of register-value pairs, e.g. "0x12345678 0x4321"
 
+config ZYNQ_M29EW_WB_HACK
+	bool "Zynq NOR hack"
+	default n
+	help
+	  The option provides hack for Zynq NOR driver which is required
+	  for NOR operations to work as expected.
+
+# Temporary Kconfig options which needs to be fixed
+config SYS_I2C_MUX_ADDR
+	int
+
+config SYS_I2C_MUX_EEPROM_SEL
+	int
+
 config ZYNQ_SDHCI_MAX_FREQ
 	default 52000000
-
-source "board/xilinx/Kconfig"
-source "board/xilinx/zynq/Kconfig"
 
 endif

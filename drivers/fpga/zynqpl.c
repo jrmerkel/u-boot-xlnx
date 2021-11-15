@@ -8,13 +8,9 @@
 
 #include <common.h>
 #include <console.h>
-#include <cpu_func.h>
-#include <log.h>
-#include <asm/cache.h>
 #include <asm/io.h>
 #include <fs.h>
 #include <zynqpl.h>
-#include <linux/delay.h>
 #include <linux/sizes.h>
 #include <asm/arch/hardware.h>
 #include <asm/arch/sys_proto.h>
@@ -315,7 +311,7 @@ static u32 *zynq_align_dma_buffer(u32 *buf, u32 len, u32 swap)
 		if (new_buf > buf) {
 			debug("%s: Aligned buffer is after buffer start\n",
 			      __func__);
-			new_buf = (u32 *)((u32)new_buf - ARCH_DMA_MINALIGN);
+			new_buf -= ARCH_DMA_MINALIGN;
 		}
 		printf("%s: Align buffer at %x to %x(swap %d)\n", __func__,
 		       (u32)buf, (u32)new_buf, swap);
@@ -428,8 +424,7 @@ static int zynq_loadfs(xilinx_desc *desc, const void *buf, size_t bsize,
 	loff_t blocksize, actread;
 	loff_t pos = 0;
 	int fstype;
-	char *interface, *dev_part;
-	const char *filename;
+	char *interface, *dev_part, *filename;
 
 	blocksize = fsinfo->blocksize;
 	interface = fsinfo->interface;

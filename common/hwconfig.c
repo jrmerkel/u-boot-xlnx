@@ -11,10 +11,8 @@
 #ifndef HWCONFIG_TEST
 #include <config.h>
 #include <common.h>
-#include <env.h>
 #include <exports.h>
 #include <hwconfig.h>
-#include <log.h>
 #include <linux/types.h>
 #include <linux/string.h>
 #else

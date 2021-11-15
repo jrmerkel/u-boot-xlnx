@@ -36,6 +36,11 @@ config COUNTER_FREQUENCY
 config ZYNQ_SDHCI_MAX_FREQ
 	default 200000000
 
+config VERSAL_OF_BOARD_DTB_ADDR
+	hex
+	default 0x1000
+	depends on OF_BOARD
+
 config IOU_SWITCH_DIVISOR0
 	hex "IOU switch divisor0"
 	default 0x20
@@ -55,14 +60,5 @@ config DEFINE_TCM_OCM_MMAP
 	help
 	  This option if enabled defines the TCM and OCM memory and its
 	  memory attributes in MMU table entry.
-
-config VERSAL_NO_DDR
-	bool "Disable DDR MMU mapping"
-	help
-	  This option configures MMU with no DDR to avoid speculative
-	  access to DDR memory where DDR is not present.
-
-source "board/xilinx/Kconfig"
-source "board/xilinx/versal/Kconfig"
 
 endif

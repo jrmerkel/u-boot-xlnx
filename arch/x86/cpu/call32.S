@@ -32,7 +32,8 @@ cpu_call32:
 	push	%rdi	/* 32-bit code segment */
 	lea	compat(%rip), %rax
 	push	%rax
-	retfq
+	.byte	0x48	/* REX prefix to force 64-bit far return */
+	retf
 .code32
 compat:
 	/*
@@ -59,4 +60,4 @@ compat:
 	/* Jump to the required target */
 	pushl	%edi	/* 32-bit code segment */
 	pushl	%esi	/* 32-bit target address */
-	retfl
+	retf

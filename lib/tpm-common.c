@@ -8,7 +8,6 @@
 
 #include <common.h>
 #include <dm.h>
-#include <log.h>
 #include <asm/unaligned.h>
 #include <tpm-common.h>
 #include "tpm-utils.h"

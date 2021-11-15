@@ -5,14 +5,11 @@
  */
 
 #include <common.h>
-#include <init.h>
 #include <asm/armv8/mmu.h>
-#include <asm/cache.h>
 #include <asm/io.h>
+#include <asm/sections.h>
 #include <asm/arch/hardware.h>
 #include <asm/arch/sys_proto.h>
-#include <asm/cache.h>
-#include <dm/platdata.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -85,15 +82,6 @@ void mem_map_fill(void)
 		if (!gd->bd->bi_dram[i].size)
 			break;
 
-#if defined(CONFIG_VERSAL_NO_DDR)
-		if (gd->bd->bi_dram[i].start < 0x80000000UL ||
-		    gd->bd->bi_dram[i].start > 0x100000000UL) {
-			printf("Ignore caches over %llx/%llx\n",
-			       gd->bd->bi_dram[i].start,
-			       gd->bd->bi_dram[i].size);
-			continue;
-		}
-#endif
 		versal_mem_map[banks].virt = gd->bd->bi_dram[i].start;
 		versal_mem_map[banks].phys = gd->bd->bi_dram[i].start;
 		versal_mem_map[banks].size = gd->bd->bi_dram[i].size;
@@ -111,7 +99,7 @@ u64 get_page_table_size(void)
 }
 
 #if defined(CONFIG_SYS_MEM_RSVD_FOR_MMU)
-int arm_reserve_mmu(void)
+int reserve_mmu(void)
 {
 	tcm_init(TCM_LOCK);
 	gd->arch.tlb_size = PGTABLE_SIZE;
@@ -121,6 +109,48 @@ int arm_reserve_mmu(void)
 }
 #endif
 
-U_BOOT_DEVICE(soc_xilinx_versal) = {
-	.name = "soc_xilinx_versal",
-};
+#if defined(CONFIG_OF_BOARD)
+void *board_fdt_blob_setup(void)
+{
+	static void *fw_dtb = (void *)CONFIG_VERSAL_OF_BOARD_DTB_ADDR;
+
+	if (fdt_magic(fw_dtb) == FDT_MAGIC)
+		return fw_dtb;
+
+	printf("DTB is not passed via 0x%llx\n", (u64)fw_dtb);
+
+	/* Try to look at FDT is at end of image */
+	fw_dtb = (ulong *)&_end;
+
+	if (fdt_magic(fw_dtb) == FDT_MAGIC)
+		return fw_dtb;
+
+	printf("DTB is also not passed via 0x%llx\n", (u64)fw_dtb);
+	return NULL;
+}
+#endif
+
+int versal_pm_request(u32 api_id, u32 arg0, u32 arg1, u32 arg2,
+		      u32 arg3, u32 *ret_payload)
+{
+	struct pt_regs regs;
+
+	if (current_el() == 3)
+		return 0;
+
+	regs.regs[0] = PM_SIP_SVC | api_id;
+	regs.regs[1] = ((u64)arg1 << 32) | arg0;
+	regs.regs[2] = ((u64)arg3 << 32) | arg2;
+
+	smc_call(&regs);
+
+	if (ret_payload) {
+		ret_payload[0] = (u32)regs.regs[0];
+		ret_payload[1] = upper_32_bits(regs.regs[0]);
+		ret_payload[2] = (u32)regs.regs[1];
+		ret_payload[3] = upper_32_bits(regs.regs[1]);
+		ret_payload[4] = (u32)regs.regs[2];
+	}
+
+	return regs.regs[0];
+}

@@ -10,7 +10,6 @@
  */
 
 #include <common.h>
-#include <init.h>
 #include <asm/io.h>
 #include <asm/arch/mmc_host_def.h>
 #include <asm/arch/mem.h>
@@ -64,7 +63,7 @@ void set_muxconf_regs(void)
 }
 
 #if defined(CONFIG_MMC)
-int board_mmc_init(struct bd_info *bis)
+int board_mmc_init(bd_t *bis)
 {
 	return omap_mmc_init(0, 0, 0, -1, -1);
 }

@@ -7,7 +7,6 @@
 #include <dm.h>
 #include <fdtdec.h>
 #include <fdt_support.h>
-#include <log.h>
 #include <video.h>
 
 static int simple_video_probe(struct udevice *dev)

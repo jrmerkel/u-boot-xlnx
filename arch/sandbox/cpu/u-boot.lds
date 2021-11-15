@@ -44,6 +44,8 @@ SECTIONS
 	{
 		*(.__efi_runtime_rel_stop)
 	}
+
+	__bss_start = .;
 }
 
 INSERT BEFORE .data;

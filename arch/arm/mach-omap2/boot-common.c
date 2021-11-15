@@ -9,7 +9,7 @@
 
 #include <common.h>
 #include <ahci.h>
-#include <log.h>
+#include <environment.h>
 #include <spl.h>
 #include <asm/omap_common.h>
 #include <asm/arch/omap.h>
@@ -93,7 +93,7 @@ void save_omap_boot_params(void)
 			sys_boot_device = 1;
 			break;
 #endif
-#if defined(BOOT_DEVICE_USB) && !defined(CONFIG_SPL_USB_STORAGE)
+#if defined(BOOT_DEVICE_USB) && !defined(CONFIG_SPL_USB_SUPPORT)
 		case BOOT_DEVICE_USB:
 			sys_boot_device = 1;
 			break;
@@ -108,7 +108,7 @@ void save_omap_boot_params(void)
 			sys_boot_device = 1;
 			break;
 #endif
-#if defined(BOOT_DEVICE_DFU) && !defined(CONFIG_SPL_DFU)
+#if defined(BOOT_DEVICE_DFU) && !defined(CONFIG_SPL_DFU_SUPPORT)
 		case BOOT_DEVICE_DFU:
 			sys_boot_device = 1;
 			break;
@@ -188,16 +188,17 @@ u32 spl_boot_device(void)
 	return gd->arch.omap_boot_device;
 }
 
-u32 spl_mmc_boot_mode(const u32 boot_device)
+u32 spl_boot_mode(const u32 boot_device)
 {
 	return gd->arch.omap_boot_mode;
 }
 
 void spl_board_init(void)
 {
+#ifdef CONFIG_SPL_SERIAL_SUPPORT
 	/* Prepare console output */
 	preloader_console_init();
-
+#endif
 #if defined(CONFIG_SPL_NAND_SUPPORT) || defined(CONFIG_SPL_ONENAND_SUPPORT)
 	gpmc_init();
 #endif
@@ -207,7 +208,7 @@ void spl_board_init(void)
 #if defined(CONFIG_AM33XX) && defined(CONFIG_SPL_MUSB_NEW_SUPPORT)
 	arch_misc_init();
 #endif
-#if defined(CONFIG_HW_WATCHDOG) || defined(CONFIG_WATCHDOG)
+#if defined(CONFIG_HW_WATCHDOG)
 	hw_watchdog_init();
 #endif
 #ifdef CONFIG_AM33XX

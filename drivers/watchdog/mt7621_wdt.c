@@ -12,7 +12,6 @@
 #include <common.h>
 #include <dm.h>
 #include <wdt.h>
-#include <linux/bitops.h>
 #include <linux/io.h>
 
 DECLARE_GLOBAL_DATA_PTR;

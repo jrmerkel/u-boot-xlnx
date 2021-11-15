@@ -53,7 +53,6 @@
  */
 
 #include <common.h>
-#include <init.h>
 #include <net.h>
 #include <netdev.h>
 #include <miiphy.h>
@@ -147,7 +146,7 @@ int board_init(void)
 /*
  * This is optionally called last during late initialization.
  */
-int board_eth_init(struct bd_info *bis)
+int board_eth_init(bd_t *bis)
 {
 	const char *devname;
 	unsigned short mode;
@@ -180,7 +179,7 @@ int board_eth_init(struct bd_info *bis)
 #endif
 
 #ifdef CONFIG_GENERIC_ATMEL_MCI
-int board_mmc_init(struct bd_info *bd)
+int board_mmc_init(bd_t *bd)
 {
 	at91_periph_clk_enable(ATMEL_ID_MCI);
 

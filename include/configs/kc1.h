@@ -70,6 +70,7 @@
  * SPL
  */
 
+#define CONFIG_SPL_TEXT_BASE		0x40300000
 #define CONFIG_SPL_MAX_SIZE		(SRAM_SCRATCH_SPACE_ADDR - \
 					 CONFIG_SPL_TEXT_BASE)
 #define CONFIG_SPL_BSS_START_ADDR	0x80000000
@@ -102,6 +103,10 @@
 /*
  * Environment
  */
+
+#define CONFIG_ENV_SIZE		(128 * 1024)
+
+#define CONFIG_ENV_OVERWRITE
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"kernel_addr_r=0x82000000\0" \
@@ -146,5 +151,11 @@
 	"mmc dev ${boot_mmc_dev}; " \
 	"mmc read ${kernel_addr_r} ${boot_mmc_start} ${boot_mmc_size} && " \
 	"bootm ${kernel_addr_r};"
+
+/*
+ * Defaults
+ */
+
+#include <config_defaults.h>
 
 #endif

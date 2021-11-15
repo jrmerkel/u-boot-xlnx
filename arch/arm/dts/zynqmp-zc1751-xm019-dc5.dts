@@ -2,7 +2,7 @@
 /*
  * dts file for Xilinx ZynqMP zc1751-xm019-dc5
  *
- * (C) Copyright 2015 - 2021, Xilinx, Inc.
+ * (C) Copyright 2015 - 2018, Xilinx, Inc.
  *
  * Siva Durga Prasad <siva.durga.paladugu@xilinx.com>
  * Michal Simek <michal.simek@xilinx.com>
@@ -21,6 +21,7 @@
 
 	aliases {
 		ethernet0 = &gem1;
+		gpio0 = &gpio;
 		i2c0 = &i2c0;
 		i2c1 = &i2c1;
 		mmc0 = &sdhci0;
@@ -117,7 +118,7 @@
 			groups = "i2c0_18_grp";
 			bias-pull-up;
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
 	};
 
@@ -130,7 +131,7 @@
 		conf {
 			groups = "gpio0_74_grp", "gpio0_75_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
 	};
 
@@ -144,7 +145,7 @@
 			groups = "i2c1_19_grp";
 			bias-pull-up;
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
 	};
 
@@ -157,7 +158,7 @@
 		conf {
 			groups = "gpio0_76_grp", "gpio0_77_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
 	};
 
@@ -170,7 +171,7 @@
 		conf {
 			groups = "uart0_17_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
 
 		conf-rx {
@@ -193,7 +194,7 @@
 		conf {
 			groups = "uart1_18_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
 
 		conf-rx {
@@ -216,7 +217,7 @@
 		conf {
 			groups = "ethernet1_0_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
 
 		conf-rx {
@@ -241,7 +242,7 @@
 		conf-mdio {
 			groups = "mdio1_0_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 			bias-disable;
 		};
 	};
@@ -255,7 +256,7 @@
 		conf {
 			groups = "sdio0_0_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 			bias-disable;
 		};
 
@@ -269,7 +270,7 @@
 			bias-high-impedance;
 			bias-pull-up;
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
 
 		mux-wp {
@@ -282,7 +283,7 @@
 			bias-high-impedance;
 			bias-pull-up;
 			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS18>;
+			io-standard = <IO_STANDARD_LVCMOS18>;
 		};
 	};
 
@@ -407,7 +408,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_sdhci0_default>;
 	no-1-8-v;
-	xlnx,mio-bank = <0>;
+	xlnx,mio_bank = <0>;
 };
 
 &ttc0 {

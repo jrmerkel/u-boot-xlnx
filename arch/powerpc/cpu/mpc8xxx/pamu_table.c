@@ -4,7 +4,6 @@
  */
 
 #include <common.h>
-#include <log.h>
 #include <asm/fsl_pamu.h>
 
 DECLARE_GLOBAL_DATA_PTR;

@@ -4,9 +4,6 @@
  *      Tapani Utriainen <linuxfae@technexion.com>
  */
 #include <common.h>
-#include <bootstage.h>
-#include <init.h>
-#include <malloc.h>
 #include <netdev.h>
 #include <twl4030.h>
 #include <asm/io.h>
@@ -182,7 +179,7 @@ void set_muxconf_regs(void)
 }
 
 #if defined(CONFIG_MMC)
-int board_mmc_init(struct bd_info *bis)
+int board_mmc_init(bd_t *bis)
 {
 	omap_mmc_init(0, 0, 0, -1, -1);
 

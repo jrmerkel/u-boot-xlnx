@@ -7,7 +7,6 @@
 
 #include <common.h>
 #include <dm.h>
-#include <log.h>
 #include <asm/gpio.h>
 #include <asm/io.h>
 #include <asm/intel_regs.h>
@@ -15,7 +14,6 @@
 #include <asm/pch_common.h>
 #include <asm/pch_common.h>
 #include <asm/arch/pch.h>
-#include <linux/delay.h>
 
 struct sata_platdata {
 	int port_map;

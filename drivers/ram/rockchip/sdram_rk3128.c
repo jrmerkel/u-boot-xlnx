@@ -5,12 +5,11 @@
 
 #include <common.h>
 #include <dm.h>
-#include <log.h>
 #include <ram.h>
 #include <syscon.h>
-#include <asm/arch-rockchip/clock.h>
-#include <asm/arch-rockchip/grf_rk3128.h>
-#include <asm/arch-rockchip/sdram.h>
+#include <asm/arch/clock.h>
+#include <asm/arch/grf_rk3128.h>
+#include <asm/arch/sdram_common.h>
 
 struct dram_info {
 	struct ram_info info;

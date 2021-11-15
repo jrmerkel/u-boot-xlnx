@@ -6,10 +6,8 @@
  */
 #include <common.h>
 #include <dm.h>
-#include <malloc.h>
 #include <dm/read.h>
 #include <asm/io.h>
-#include <linux/bitops.h>
 #include <linux/delay.h>
 #include <misc.h>
 

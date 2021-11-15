@@ -13,7 +13,6 @@
 #include <dm.h>
 #include <rtc.h>
 #include <asm/io.h>
-#include <linux/delay.h>
 #include "mvrtc.h"
 
 /* This RTC does not support century, so we assume 20 */
@@ -172,7 +171,7 @@ static int mv_rtc_ofdata_to_platdata(struct udevice *dev)
 {
 	struct mvrtc_pdata *pdata = dev_get_platdata(dev);
 
-	pdata->iobase = dev_read_addr(dev);
+	pdata->iobase = devfdt_get_addr(dev);
 	return 0;
 }
 

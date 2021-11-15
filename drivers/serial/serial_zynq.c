@@ -10,14 +10,12 @@
 #include <dm.h>
 #include <errno.h>
 #include <fdtdec.h>
-#include <log.h>
 #include <watchdog.h>
 #include <asm/io.h>
-#include <dm/device_compat.h>
-#include <linux/bitops.h>
 #include <linux/compiler.h>
 #include <serial.h>
-#include <linux/err.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 #define ZYNQ_UART_SR_TXACTIVE	BIT(11) /* TX active */
 #define ZYNQ_UART_SR_TXFULL	BIT(4) /* TX FIFO full */
@@ -45,7 +43,7 @@ struct zynq_uart_platdata {
 	struct uart_zynq *regs;
 };
 
-/* Set up the baud rate */
+/* Set up the baud rate in gd struct */
 static void _uart_zynq_serial_setbrg(struct uart_zynq *regs,
 				     unsigned long clock, unsigned long baud)
 {
@@ -127,7 +125,7 @@ static int zynq_serial_setbrg(struct udevice *dev, int baudrate)
 	debug("%s: CLK %ld\n", __func__, clock);
 
 	ret = clk_enable(&clk);
-	if (ret) {
+	if (ret && ret != -ENOSYS) {
 		dev_err(dev, "failed to enable clock\n");
 		return ret;
 	}
@@ -140,12 +138,9 @@ static int zynq_serial_setbrg(struct udevice *dev, int baudrate)
 static int zynq_serial_probe(struct udevice *dev)
 {
 	struct zynq_uart_platdata *platdata = dev_get_platdata(dev);
-	struct uart_zynq *regs = platdata->regs;
-	u32 val;
 
-	/* No need to reinitialize the UART if TX already enabled */
-	val = readl(&regs->control);
-	if (val & ZYNQ_UART_CR_TX_EN)
+	/* No need to reinitialize the UART after relocation */
+	if (gd->flags & GD_FLG_RELOC)
 		return 0;
 
 	_uart_zynq_serial_init(platdata->regs);

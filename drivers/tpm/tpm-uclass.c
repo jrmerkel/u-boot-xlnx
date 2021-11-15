@@ -6,8 +6,6 @@
 
 #include <common.h>
 #include <dm.h>
-#include <log.h>
-#include <linux/delay.h>
 #include <linux/unaligned/be_byteshift.h>
 #include <tpm-v1.h>
 #include <tpm-v2.h>
@@ -74,7 +72,7 @@ int tpm_xfer(struct udevice *dev, const uint8_t *sendbuf, size_t send_size,
 	struct tpm_ops *ops = tpm_get_ops(dev);
 	ulong start, stop;
 	uint count, ordinal;
-	int ret, ret2 = 0;
+	int ret, ret2;
 
 	if (ops->xfer)
 		return ops->xfer(dev, sendbuf, send_size, recvbuf, recv_size);
@@ -122,16 +120,9 @@ int tpm_xfer(struct udevice *dev, const uint8_t *sendbuf, size_t send_size,
 		}
 	} while (ret);
 
-	if (ret) {
-		if (ops->cleanup) {
-			ret2 = ops->cleanup(dev);
-			if (ret2)
-				return log_msg_ret("cleanup", ret2);
-		}
-		return log_msg_ret("xfer", ret);
-	}
+	ret2 = ops->cleanup ? ops->cleanup(dev) : 0;
 
-	return 0;
+	return ret2 ? ret2 : ret;
 }
 
 UCLASS_DRIVER(tpm) = {

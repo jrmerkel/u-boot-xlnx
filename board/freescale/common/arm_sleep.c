@@ -4,7 +4,6 @@
  */
 
 #include <common.h>
-#include <log.h>
 #include <asm/io.h>
 #ifndef CONFIG_ARMV7_NONSEC
 #error " Deep sleep needs non-secure mode support. "

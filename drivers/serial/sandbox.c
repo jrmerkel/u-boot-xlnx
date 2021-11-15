@@ -33,7 +33,7 @@ DECLARE_GLOBAL_DATA_PTR;
  *   serial_buf_write		 == serial_buf_read -> empty buffer
  *   (serial_buf_write + 1) % 16 == serial_buf_read -> full buffer
  */
-static unsigned char serial_buf[16];
+static char serial_buf[16];
 static unsigned int serial_buf_write;
 static unsigned int serial_buf_read;
 
@@ -93,9 +93,7 @@ static int sandbox_serial_putc(struct udevice *dev, const char ch)
 	struct sandbox_serial_priv *priv = dev_get_priv(dev);
 	struct sandbox_serial_platdata *plat = dev->platdata;
 
-	/* With of-platdata we don't real the colour correctly, so disable it */
-	if (!CONFIG_IS_ENABLED(OF_PLATDATA) && priv->start_of_line &&
-	    plat->colour != -1) {
+	if (priv->start_of_line && plat->colour != -1) {
 		priv->start_of_line = false;
 		output_ansi_colour(plat->colour);
 	}
@@ -200,7 +198,6 @@ static int sandbox_serial_getinfo(struct udevice *dev,
 		.reg_width = 1,
 		.reg_offset = 0,
 		.reg_shift = 0,
-		.clock = SERIAL_DEFAULT_CLOCK,
 	};
 
 	if (!serial_info)
@@ -223,8 +220,6 @@ static int sandbox_serial_ofdata_to_platdata(struct udevice *dev)
 	const char *colour;
 	int i;
 
-	if (CONFIG_IS_ENABLED(OF_PLATDATA))
-		return 0;
 	plat->colour = -1;
 	colour = fdt_getprop(gd->fdt_blob, dev_of_offset(dev),
 			     "sandbox,text-colour", NULL);
@@ -254,8 +249,8 @@ static const struct udevice_id sandbox_serial_ids[] = {
 	{ }
 };
 
-U_BOOT_DRIVER(sandbox_serial) = {
-	.name	= "sandbox_serial",
+U_BOOT_DRIVER(serial_sandbox) = {
+	.name	= "serial_sandbox",
 	.id	= UCLASS_SERIAL,
 	.of_match = sandbox_serial_ids,
 	.ofdata_to_platdata = sandbox_serial_ofdata_to_platdata,
@@ -267,15 +262,12 @@ U_BOOT_DRIVER(sandbox_serial) = {
 	.flags = DM_FLAG_PRE_RELOC,
 };
 
-#if !CONFIG_IS_ENABLED(OF_PLATDATA)
 static const struct sandbox_serial_platdata platdata_non_fdt = {
 	.colour = -1,
 };
 
 U_BOOT_DEVICE(serial_sandbox_non_fdt) = {
-	.name = "sandbox_serial",
+	.name = "serial_sandbox",
 	.platdata = &platdata_non_fdt,
 };
-#endif
-
 #endif /* CONFIG_IS_ENABLED(OF_CONTROL) */

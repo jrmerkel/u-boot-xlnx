@@ -9,13 +9,10 @@
  * Copyright 2014 Linaro, Ltd.
  * Rob Herring <robh@kernel.org>
  */
-#include <command.h>
 #include <config.h>
 #include <common.h>
-#include <env.h>
 #include <errno.h>
 #include <fastboot.h>
-#include <log.h>
 #include <malloc.h>
 #include <linux/usb/ch9.h>
 #include <linux/usb/gadget.h>
@@ -441,6 +438,8 @@ static void rx_handler_command(struct usb_ep *ep, struct usb_request *req)
 		req->length = rx_bytes_expected(ep);
 	}
 
+	fastboot_tx_write_str(response);
+
 	if (!strncmp("OKAY", response, 4)) {
 		switch (cmd) {
 		case FASTBOOT_COMMAND_BOOT:
@@ -453,14 +452,10 @@ static void rx_handler_command(struct usb_ep *ep, struct usb_request *req)
 
 		case FASTBOOT_COMMAND_REBOOT:
 		case FASTBOOT_COMMAND_REBOOT_BOOTLOADER:
-		case FASTBOOT_COMMAND_REBOOT_FASTBOOTD:
-		case FASTBOOT_COMMAND_REBOOT_RECOVERY:
 			fastboot_func->in_req->complete = compl_do_reset;
 			break;
 		}
 	}
-
-	fastboot_tx_write_str(response);
 
 	*cmdbuf = '\0';
 	req->actual = 0;

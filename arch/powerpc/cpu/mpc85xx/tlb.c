@@ -7,7 +7,6 @@
  */
 
 #include <common.h>
-#include <asm/bitops.h>
 #include <asm/processor.h>
 #include <asm/mmu.h>
 #ifdef CONFIG_ADDR_MAP

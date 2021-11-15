@@ -8,7 +8,6 @@
  */
 
 #include <common.h>
-#include <init.h>
 #include <asm/arch/at91sam9_smc.h>
 #include <asm/arch/at91_common.h>
 #include <asm/arch/at91_matrix.h>
@@ -115,7 +114,7 @@ int dram_init(void)
 	return 0;
 }
 
-int board_eth_init(struct bd_info *bis)
+int board_eth_init(bd_t *bis)
 {
 	int rc = 0;
 

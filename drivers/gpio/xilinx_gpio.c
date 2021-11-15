@@ -5,7 +5,6 @@
 
 #include <common.h>
 #include <errno.h>
-#include <log.h>
 #include <malloc.h>
 #include <linux/list.h>
 #include <asm/io.h>

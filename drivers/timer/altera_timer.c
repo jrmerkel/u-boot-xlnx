@@ -12,7 +12,6 @@
 #include <errno.h>
 #include <timer.h>
 #include <asm/io.h>
-#include <linux/bitops.h>
 
 /* control register */
 #define ALTERA_TIMER_CONT	BIT(1)	/* Continuous mode */
@@ -32,7 +31,7 @@ struct altera_timer_platdata {
 	struct altera_timer_regs *regs;
 };
 
-static u64 altera_timer_get_count(struct udevice *dev)
+static int altera_timer_get_count(struct udevice *dev, u64 *count)
 {
 	struct altera_timer_platdata *plat = dev->platdata;
 	struct altera_timer_regs *const regs = plat->regs;
@@ -44,7 +43,9 @@ static u64 altera_timer_get_count(struct udevice *dev)
 	/* Read timer value */
 	val = readl(&regs->snapl) & 0xffff;
 	val |= (readl(&regs->snaph) & 0xffff) << 16;
-	return timer_conv_64(~val);
+	*count = timer_conv_64(~val);
+
+	return 0;
 }
 
 static int altera_timer_probe(struct udevice *dev)
@@ -67,7 +68,7 @@ static int altera_timer_ofdata_to_platdata(struct udevice *dev)
 {
 	struct altera_timer_platdata *plat = dev_get_platdata(dev);
 
-	plat->regs = map_physmem(dev_read_addr(dev),
+	plat->regs = map_physmem(devfdt_get_addr(dev),
 				 sizeof(struct altera_timer_regs),
 				 MAP_NOCACHE);
 

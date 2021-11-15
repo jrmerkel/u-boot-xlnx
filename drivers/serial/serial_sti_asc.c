@@ -3,15 +3,13 @@
  * Support for Serial I/O using STMicroelectronics' on-chip ASC.
  *
  * Copyright (C) 2017, STMicroelectronics - All Rights Reserved
- * Author(s): Patrice Chotard, <patrice.chotard@foss.st.com> for STMicroelectronics.
+ * Author(s): Patrice Chotard, <patrice.chotard@st.com> for STMicroelectronics.
  */
 
 #include <common.h>
 #include <dm.h>
-#include <log.h>
 #include <serial.h>
 #include <asm/io.h>
-#include <linux/bitops.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -171,7 +169,7 @@ static int sti_asc_serial_probe(struct udevice *dev)
 	unsigned long val;
 	fdt_addr_t base;
 
-	base = dev_read_addr(dev);
+	base = devfdt_get_addr(dev);
 	if (base == FDT_ADDR_T_NONE)
 		return -EINVAL;
 

@@ -56,20 +56,16 @@ static int sandbox_sysreset_request(struct udevice *dev, enum sysreset_t type)
 	switch (type) {
 	case SYSRESET_COLD:
 		state->last_sysreset = type;
-		if (!state->sysreset_allowed[type])
-			return -EACCES;
-		sandbox_reset();
 		break;
-	case SYSRESET_POWER_OFF:
+	case SYSRESET_POWER:
 		state->last_sysreset = type;
 		if (!state->sysreset_allowed[type])
 			return -EACCES;
 		sandbox_exit();
 		break;
-	case SYSRESET_POWER:
+	case SYSRESET_POWER_OFF:
 		if (!state->sysreset_allowed[type])
 			return -EACCES;
-		sandbox_exit();
 	default:
 		return -ENOSYS;
 	}
@@ -133,9 +129,7 @@ U_BOOT_DRIVER(warm_sysreset_sandbox) = {
 	.ops		= &sandbox_warm_sysreset_ops,
 };
 
-#if !CONFIG_IS_ENABLED(OF_PLATDATA)
 /* This is here in case we don't have a device tree */
 U_BOOT_DEVICE(sysreset_sandbox_non_fdt) = {
 	.name = "sysreset_sandbox",
 };
-#endif
